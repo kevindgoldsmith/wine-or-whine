@@ -23,3 +23,24 @@ Judgement calls made while building, newest at the bottom of each section.
 - **Card identities are never public except when played.** Discards (including vetoed cards) are face down;
   only counts are shown.
 - **Superlative ties list every tied player.**
+
+## Server and phones
+- **The host is a phone player.** "Start a new trip" creates the room and a one-time host key kept in that
+  browser; the first player to join with it becomes host. The host can hand the role to someone else.
+- **Rejoin with the 4-digit code rotates the seat token**, signing out any other phone that held the seat.
+  Failed codes are rate-limited per room (8 per 10 minutes) so the 10,000 codes can't be brute-forced.
+- **Seat tokens and the host key are stored hashed** in snapshots.
+- **Abandoned games expire after 7 days of inactivity** (lobbies and finished games after 12 hours). The brief
+  says active games never expire; a week-long cap stops dead rooms filling the room limit forever.
+- **Limits:** 300 live rooms, 30 room creations per IP per hour, 8 KB per WebSocket message, 40 messages per
+  10 s per socket. Configurable by env var (`MAX_ROOMS`, `ROOM_CREATES_PER_HOUR`).
+- **Every accepted change is saved before it is broadcast or acknowledged**, so an acknowledged action is never
+  lost on restart. Clients resend unacknowledged actions after reconnecting; the server de-duplicates by
+  action id (the last 300 ids are part of the snapshot).
+- **Keepalive** is an app-level `{"t":"ping"}` every 20 s (browsers can't see protocol pings); a client that
+  hears nothing for 45 s reconnects. uvicorn's protocol-level pings stay on to reap dead sockets server-side.
+- **TTS only speaks text the server announced** (registered by hash), so `/api/tts/{hash}` can't be used to
+  spend the API key on arbitrary text.
+- **Rules hints** are on for the first game; "Play again" turns them off unless the host ticks the box.
+- **Discreet mode also strips emoji from choice text** (e.g. "😴 Sleeping in" becomes "Sleeping in").
+- **The host menu (⋯)** holds pause/resume, rejoin codes and the voice toggle during a game.
