@@ -64,3 +64,7 @@ Judgement calls made while building, newest at the bottom of each section.
   Railway's SIGTERM; otherwise `/bin/sh` swallows it and the graceful 1012 close never happens.
 - **`scripts/smoke.py`** is the post-deploy smoke test; `DELETE /api/rooms/{code}` (host key required, never an
   active game) lets it clean up its test room.
+- **Verified on Railway (2026-11-22):** redeploying mid-game (8 phones + TV, Day 3, mid-vote). Railway kept the
+  old container serving until the new one passed `/livez` (~33 s), then the old one closed every socket with
+  1012. All 8 phones and the TV were back on the new container within 1.03 s, in the same day and phase, and
+  the game played on to the end.
