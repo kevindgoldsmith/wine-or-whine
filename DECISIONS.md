@@ -7,9 +7,13 @@ Judgement calls made while building, newest at the bottom of each section.
   authoritative; the Postgres snapshot written after every accepted action exists for restart recovery only.
   Scaling out would need a shared pub/sub and is out of scope.
 - **No `railway.json` / `railway.toml`.** Service settings live in the Railway dashboard and are listed in the README.
-- **Deploy path: GitHub-connected service, deploy branch `main`.** Work happens on branches and is merged to
-  `main` only when Kevin okays a deploy, so deploys can be triggered from a phone. `railway up` with the project
-  token stays available as a fallback.
+- **Deploy path: `railway up` from a Claude session (Kevin's choice, 2026-11-22).** The project token is saved
+  as a network secret on the `kg-personal` cloud environment (header `Project-Access-Token`), never in the repo
+  or an env var. The service is not GitHub-connected, so pushing to `main` does not deploy. Connecting the repo
+  in the dashboard later would switch to merge-to-deploy.
+- **Railway layout:** project "focused-laughter" (a project token can't rename it; rename in the dashboard),
+  environment `production`, services `Postgres` (official template) and `wine-or-whine`
+  (https://wine-or-whine-production.up.railway.app). Voice: `TTS_PROVIDER=none` (browser speech) for now.
 
 ## Rules engine
 - **Role reveal is a real phase.** The first day starts only once every player has tapped "Got it", so nobody

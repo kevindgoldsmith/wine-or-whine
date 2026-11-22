@@ -51,7 +51,7 @@ One project, two services: this app and Postgres. Railway builds the `Dockerfile
 There is deliberately **no `railway.json` / `railway.toml`**: every setting below lives in the dashboard.
 
 1. **Postgres:** in the project, *New → Database → PostgreSQL*.
-2. **App service:** *New → GitHub repo* → this repo, deploy branch **`main`**.
+2. **App service:** an empty service (deployed with `railway up`), or *New → GitHub repo* → this repo with deploy branch **`main`**.
 3. **Variables** (app service):
 
    | Variable | Value |
@@ -69,7 +69,10 @@ There is deliberately **no `railway.json` / `railway.toml`**: every setting belo
 6. After each deploy, run the smoke test: `python scripts/smoke.py https://<generated domain>`
    (checks `/livez` and `/health`, joins and reconnects 5 WebSocket clients, deletes its test room).
 
-Deploys happen by merging to `main`. Fallback: `railway up --service <app service> --detach` with a project token.
+**Current setup:** the service is *not* GitHub-connected; deploys are `railway up` from a Claude session using
+a project token stored as a cloud-environment network secret:
+`RAILWAY_TOKEN=proxy-injected railway up --service <app service id> --environment <env id> --project <project id> --detach`.
+(To deploy on merge instead, connect the repo to the service in the dashboard with deploy branch `main`.)
 
 ### Why it survives deploys
 
