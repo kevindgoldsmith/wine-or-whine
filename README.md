@@ -24,6 +24,11 @@ That tab then remembers its seat in per-tab storage, so every `?test` tab or win
 as a separate player (marked "TEST TAB" in the corner). Reloading a test tab keeps its seat; closing it loses
 it (use the rejoin code). Without `?test`, all tabs in a browser share one seat, as on a real phone.
 
+**Watching a demo game:** on a TV or laptop tap **Start a new trip on this TV**, then run
+`python scripts/demo_players.py https://<site> <CODE>` (needs `requirements-dev.txt`). Eight artificial players
+join; press **Start the trip** on the TV and they play one action per second (`--step`), pausing longer after
+each day (`--round-pause`).
+
 Players who switch phones: the host opens **⋯ → Show rejoin codes**, and the player picks their name and enters
 their 4-digit code. Phones that lock, reload or drop off Wi-Fi rejoin on their own.
 
