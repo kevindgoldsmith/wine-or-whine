@@ -25,6 +25,9 @@ REJOIN_FAILS_PER_WINDOW = 8
 REJOIN_WINDOW = 600.0
 
 
+TV_HOST = "tv"  # host_id value meaning "the TV that created the room is the host"
+
+
 class RoomError(Exception):
     """A rejected request. ``code`` is a short, secret-free identifier the client can translate."""
 
@@ -62,8 +65,9 @@ class Room:
     code: str
     host_key_hash: str
     theme: str = "wine_or_whine"
-    # Rooms created from the TV board: nobody holds the host key, so the first phone to join becomes host.
-    first_joiner_hosts: bool = False
+    # Rooms created from the TV board: the TV holds the host key and starts as host (host_id == TV_HOST).
+    # It can hand hosting to a phone and take it back.
+    tv_hosted: bool = False
     players: list[Player] = field(default_factory=list)
     host_id: Optional[str] = None
     status: str = "lobby"  # lobby | active | over
@@ -144,9 +148,7 @@ class Room:
         rejoin = next(c for c in (f"{secrets.randbelow(10000):04d}" for _ in range(1000)) if c not in taken)
         p = Player(id=secrets.token_hex(4), name=name, token_hash=hash_secret(token), rejoin=rejoin)
         self.players.append(p)
-        if self.host_id is None and (
-            self.first_joiner_hosts or (host_key and _same(hash_secret(host_key), self.host_key_hash))
-        ):
+        if self.host_id is None and host_key and _same(hash_secret(host_key), self.host_key_hash):
             self.host_id = p.id
         self.touch()
         return p, token
@@ -167,7 +169,11 @@ class Room:
         return p, token
 
     # ------------------------------------------------------------ host controls
+    def check_host_key(self, key: object) -> bool:
+        return isinstance(key, str) and 0 < len(key) <= 100 and _same(hash_secret(key), self.host_key_hash)
+
     def host_action(self, pid: str, a: dict, boards: dict, themes: dict) -> list[dict]:
+        """``pid`` is a player id, or TV_HOST for the TV that created the room."""
         if pid != self.host_id:
             raise RoomError("not_host")
         t = a.get("type") if isinstance(a, dict) else None
@@ -185,9 +191,10 @@ class Room:
                 raise RoomError("bad_request")
             self.players = [p for p in self.players if p.id != target]
         elif t == "make_host":
-            if not self.player(a.get("player_id")):
+            target = a.get("player_id")
+            if not (self.player(target) or (target == TV_HOST and self.tv_hosted)):
                 raise RoomError("bad_request")
-            self.host_id = a["player_id"]
+            self.host_id = target
         elif t == "settings":
             self._need_lobby()
             if "theme" in a:

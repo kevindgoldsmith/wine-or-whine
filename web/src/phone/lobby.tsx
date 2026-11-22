@@ -69,7 +69,15 @@ export function RejoinScreen(props: { conn: Connection; room: RoomView; error: s
 
 const POWERS: (Power | null)[] = [null, 'investigate', 'special_election', 'peek', 'execute']
 
-export function Lobby(props: { conn: Connection; room: RoomView; meId: string; isHost: boolean; error: string | null }) {
+export function Lobby(props: {
+  conn: Connection
+  room: RoomView
+  meId: string
+  isHost: boolean
+  error: string | null
+  /** Inside the TV's host drawer: only the seat list and host controls. */
+  embedded?: boolean
+}) {
   const { room, conn, isHost } = props
   const n = room.players.length
   const [themes, setThemes] = useState<{ id: string; name: string }[]>([])
@@ -95,16 +103,28 @@ export function Lobby(props: { conn: Connection; room: RoomView; meId: string; i
   }
   const tvUrl = `${location.origin}/${room.code}/tv`
   return (
-    <main class="screen">
-      <header class="lobby-head">
-        <h1 class="display">{ui('lobby_title')}</h1>
-        <div class="room-code" aria-label={ui('lobby_code', { code: room.code })}>{room.code}</div>
-      </header>
+    <main class={props.embedded ? 'embedded-lobby' : 'screen'}>
+      {props.embedded ? null : (
+        <header class="lobby-head">
+          <h1 class="display">{ui('lobby_title')}</h1>
+          <div class="room-code" aria-label={ui('lobby_code', { code: room.code })}>{room.code}</div>
+        </header>
+      )}
       <p class="status-line">
-        {n < 5 || n > 10 ? ui('lobby_need_players', { n }) : isHost ? ui('lobby_seat_hint') : ui('lobby_waiting_host')}
+        {n < 5 || n > 10
+          ? ui('lobby_need_players', { n })
+          : isHost
+            ? ui('lobby_seat_hint')
+            : room.host_id === 'tv'
+              ? ui('lobby_tv_host')
+              : ui('lobby_waiting_host')}
       </p>
-      <img class="qr small" src={`/api/rooms/${room.code}/qr.svg`} alt={ui('lobby_scan', { url: room.join_url })} />
-      <p class="muted center-text">{ui('lobby_scan', { url: room.join_url })}</p>
+      {props.embedded ? null : (
+        <>
+          <img class="qr small" src={`/api/rooms/${room.code}/qr.svg`} alt={ui('lobby_scan', { url: room.join_url })} />
+          <p class="muted center-text">{ui('lobby_scan', { url: room.join_url })}</p>
+        </>
+      )}
       <ol class="seat-list">
         {room.players.map((p, i) => (
           <li class={p.id === props.meId ? 'me' : ''}>
@@ -148,7 +168,7 @@ export function Lobby(props: { conn: Connection; room: RoomView; meId: string; i
               </select>
             </label>
           ) : null}
-          <p class="muted">{ui('home_tv_hint')}: <a href={tvUrl} target="_blank" rel="noopener">{tvUrl}</a></p>
+          {props.embedded ? null : <p class="muted">{ui('home_tv_hint')}: <a href={tvUrl} target="_blank" rel="noopener">{tvUrl}</a></p>}
           <button type="button" class="link" onClick={() => setAdvanced(!advanced)}>{ui('lobby_advanced')} {advanced ? '▴' : '▾'}</button>
           {advanced && boards ? (
             <div class="house">
@@ -180,7 +200,7 @@ export function Lobby(props: { conn: Connection; room: RoomView; meId: string; i
           ) : null}
         </section>
       ) : null}
-      <Credit />
+      {props.embedded ? null : <Credit />}
     </main>
   )
 }

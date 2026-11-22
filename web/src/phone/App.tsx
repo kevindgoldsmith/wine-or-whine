@@ -126,6 +126,12 @@ export function PhoneApp(props: { code: string }) {
         }}>{room.paused ? ui('resume') : ui('pause')}</button>
       ) : null}
       <button type="button" class="big" onClick={() => conn.host({ type: 'rejoin_codes' })}>{ui('lobby_rejoin_codes')}</button>
+      {room.tv_hosted ? (
+        <button type="button" class="big" onClick={() => {
+          conn.host({ type: 'make_host', player_id: 'tv' })
+          setMenu(false)
+        }}>📺 {ui('host_give_tv')}</button>
+      ) : null}
       {codes ? (
         <>
           <p class="muted">{ui('lobby_rejoin_hint')}</p>

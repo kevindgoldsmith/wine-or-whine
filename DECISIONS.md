@@ -80,9 +80,17 @@ Judgement calls made while building, newest at the bottom of each section.
   can't hint at which card it is. The veto button isn't a card and gets its own full-width row. Discreet lists
   use the same equal-row grid. Checked in Chromium at 320/390/430 px, including with deliberately mismatched
   labels.
-- **Games can be created from the TV.** "Start a new trip on this TV" (home page), plus a "Start a new trip"
-  button on the TV's game-over and room-expired screens. The TV isn't a player and can't press Start, so in a
-  TV-created room **the first phone to join becomes host** (the TV lobby says so). Anyone in the room could
-  join first, but everyone scans the same QR at the same table, and the host can hand the role on. Phone-created
-  rooms still require the creator's host key. The TV's "new trip" makes a new room (everyone rescans); "Play
-  again" with the same players stays on the host's phone.
+- **Games can be created from the TV, and the TV is their host** (Kevin's call, 2026-11-22; replaces an
+  earlier "first phone to join hosts" version that was never deployed). "Start a new trip on this TV" (home
+  page), plus "Start a new trip" on the TV's game-over and room-expired screens.
+  - The TV keeps the room's host key (localStorage, per device) and presents it when it connects. Only that TV
+    gets host powers, and only for rooms it created; a TV opened by typing the code can't.
+  - The TV has every host control in a 👑 Host drawer (seat order, kick, settings, house rules, start, pause,
+    play again), plus a big Start button in the TV lobby.
+  - It can make any phone the host (e.g. if the TV is out of reach) and take hosting back at any time, even
+    while a phone hosts. A phone host can also hand it back.
+  - Rejoin codes on the TV are revealed **one player at a time for 20 seconds**, never as a list, because the
+    TV is a shared screen. A host phone still sees the full list on its own screen.
+  - If the TV's browser loses its stored key, nobody can take hosting from a phone host, but the room keeps
+    working; if the TV itself was host at that point, the game can't be started or paused until a new room is
+    made. Acceptable for a party game; noted here in case it bites.

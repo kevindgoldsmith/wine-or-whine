@@ -466,17 +466,83 @@ def test_logs_never_contain_secrets(client, caplog):
 
 # ---------------------------------------------------------------- rooms created from the TV
 
-def test_tv_created_room_first_joiner_becomes_host(client):
+def tv_room(client):
     r = client.post("/api/rooms", json={"from": "tv"}).json()
     tv = Phone(client, r["code"])
-    tv.send(t="hello", kind="tv")
-    st = tv.recv_until("state")
-    assert st["room"]["first_joiner_hosts"] is True and st["room"]["host_id"] is None
-    first = join(client, r["code"], "Ann")  # no host key: the TV kept it
-    second = join(client, r["code"], "Ben")
-    assert first.state["me"]["host"] is True
-    assert second.wait_state(lambda m: len(m["room"]["players"]) == 2)["me"]["host"] is False
-    tv.wait_state(lambda m: m["room"]["host_id"] == first.pid)
+    tv.send(t="hello", kind="tv", host_key=r["host_key"])
+    tv.recv_until("state")
+    return r, tv
+
+
+def test_tv_created_room_tv_is_host(client):
+    r, tv = tv_room(client)
+    assert tv.state["room"]["host_id"] == "tv" and tv.state["tv_admin"] is True
+    phones = [join(client, r["code"], f"P{i}") for i in range(5)]
+    assert not any(p.state["me"]["host"] for p in phones)  # nobody auto-hosts
+    # Phones can't use host controls...
+    phones[0].send(t="host", id="x", a={"type": "start"})
+    assert phones[0].recv_until("error")["code"] == "not_host"
+    # ...the TV can: reorder, then start.
+    ids = [p["id"] for p in tv.wait_state(lambda m: len(m["room"]["players"]) == 5)["room"]["players"]]
+    tv.send(t="host", id="h1", a={"type": "reorder", "order": ids[::-1]})
+    tv.recv_until("ack")
+    tv.send(t="host", id="h2", a={"type": "start"})
+    tv.recv_until("ack")
+    st = tv.wait_state(lambda m: m["game"] is not None)
+    assert st["room"]["seat_ids"] == ids[::-1]
+    # The TV can't play: it has no seat.
+    tv.send(t="act", id="h3", a={"type": "ack_role"})
+    assert tv.recv_until("error")["code"] == "not_joined"
+    # Pause from the TV.
+    tv.send(t="host", id="h4", a={"type": "pause"})
+    assert tv.recv_until("ack")
+    assert phones[0].wait_state(lambda m: m["room"]["paused"])
+
+
+def test_tv_hands_hosting_to_a_phone_and_takes_it_back(client):
+    r, tv = tv_room(client)
+    a, b = join(client, r["code"], "Ann"), join(client, r["code"], "Ben")
+    tv.send(t="host", id="m1", a={"type": "make_host", "player_id": a.pid})
+    tv.recv_until("ack")
+    assert a.wait_state(lambda m: m["me"]["host"])["room"]["host_id"] == a.pid
+    # While a phone hosts, the TV can't run other host controls...
+    tv.send(t="host", id="m2", a={"type": "kick", "player_id": b.pid})
+    assert tv.recv_until("error")["code"] == "not_host"
+    # ...but it owns the room, so it can move hosting again or take it back.
+    tv.send(t="host", id="m3", a={"type": "make_host", "player_id": b.pid})
+    tv.recv_until("ack")
+    assert b.wait_state(lambda m: m["me"]["host"])
+    b.send(t="host", id="m4", a={"type": "make_host", "player_id": "tv"})  # phone hands back to the TV
+    b.recv_until("ack")
+    assert tv.wait_state(lambda m: m["room"]["host_id"] == "tv")
+
+
+def test_tv_reveals_one_rejoin_code_at_a_time(client):
+    r, tv = tv_room(client)
+    a = join(client, r["code"], "Ann")
+    tv.send(t="host", id="c1", a={"type": "rejoin_codes"})
+    assert tv.recv_until("error")["code"] == "not_host"  # never the whole list on a shared screen
+    tv.send(t="host", id="c2", a={"type": "rejoin_code", "player_id": a.pid})
+    got = tv.recv_until("rejoin_code")
+    assert got["name"] == "Ann" and len(got["code"]) == 4
+
+
+def test_tv_without_the_host_key_has_no_powers(client):
+    r, owner = tv_room(client)
+    spy = Phone(client, r["code"])
+    spy.send(t="hello", kind="tv")  # typed the code, no key
+    st = spy.recv_until("state")
+    assert st["tv_admin"] is False
+    spy.send(t="host", id="s1", a={"type": "make_host", "player_id": "tv"})
+    assert spy.recv_until("error")["code"] == "not_joined"
+    wrong = Phone(client, r["code"])
+    wrong.send(t="hello", kind="tv", host_key="guess")
+    assert wrong.recv_until("error")["code"] == "not_host"
+    # A TV for a phone-created room never gets powers, even with that room's host key.
+    code, key = new_room(client)
+    tv2 = Phone(client, code)
+    tv2.send(t="hello", kind="tv", host_key=key)
+    assert tv2.recv_until("state")["tv_admin"] is False
 
 
 def test_phone_created_room_still_needs_the_host_key(client):
@@ -485,11 +551,18 @@ def test_phone_created_room_still_needs_the_host_key(client):
     assert stranger.state["me"]["host"] is False
     owner = join(client, code, "Owner", key)
     assert owner.state["me"]["host"] is True
+    owner.send(t="host", id="x", a={"type": "make_host", "player_id": "tv"})
+    assert owner.recv_until("error")["code"] == "bad_request"  # no TV host in a phone-created room
 
 
-def test_old_snapshots_without_the_flag_still_load():
-    room = Room(code="ABCD", host_key_hash=hash_secret("k"))
-    d = room.to_dict()
-    del d["first_joiner_hosts"]  # snapshot written before TV-created rooms existed
-    restored = Room.from_dict(d)
-    assert restored.first_joiner_hosts is False
+def test_tv_host_survives_restart(tmp_path):
+    settings = make_settings(tmp_path)
+    with TestClient(create_app(settings)) as c:
+        r, tv = tv_room(c)
+        close_all_phones()
+    with TestClient(create_app(settings)) as c2:
+        tv = Phone(c2, r["code"])
+        tv.send(t="hello", kind="tv", host_key=r["host_key"])
+        st = tv.recv_until("state")
+        assert st["tv_admin"] is True and st["room"]["host_id"] == "tv"
+        close_all_phones()

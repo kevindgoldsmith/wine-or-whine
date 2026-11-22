@@ -73,6 +73,8 @@ export const seatStore = {
 
 export const tokenKey = (code: string) => `wow:${code}:token`
 export const hostKeyKey = (code: string) => `wow:${code}:host`
+/** The host key of a room created on this TV (lets the TV act as host). Per device, not per tab. */
+export const tvKeyKey = (code: string) => `wow:${code}:tvkey`
 
 function newId(): string {
   const c = globalThis.crypto as Crypto | undefined
@@ -126,8 +128,7 @@ export class Connection {
       if (ws !== this.ws) return
       this.attempt = 0
       this.lastSeen = Date.now()
-      const token = this.kind === 'player' ? seatStore.get(tokenKey(this.code)) : null
-      ws.send(JSON.stringify({ t: 'hello', kind: this.kind, token }))
+      ws.send(JSON.stringify(this.helloMsg()))
       for (const msg of this.pending.values()) ws.send(JSON.stringify(msg))
       this.setStatus('open')
     }
@@ -222,7 +223,12 @@ export class Connection {
     this.send({ t: 'rejoin', player_id: playerId, code })
   }
 
+  private helloMsg() {
+    if (this.kind === 'tv') return { t: 'hello', kind: 'tv', host_key: store.get(tvKeyKey(this.code)) }
+    return { t: 'hello', kind: 'player', token: seatStore.get(tokenKey(this.code)) }
+  }
+
   hello() {
-    this.send({ t: 'hello', kind: this.kind, token: seatStore.get(tokenKey(this.code)) })
+    this.send(this.helloMsg())
   }
 }

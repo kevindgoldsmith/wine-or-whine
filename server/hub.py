@@ -18,7 +18,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from engine.boards import load_boards
 
 from .config import Settings
-from .rooms import Room, RoomError, hash_secret, new_room_code
+from .rooms import TV_HOST, Room, RoomError, hash_secret, new_room_code
 from .theme import announcements, load_themes
 from .tts import TTS
 from .views import message
@@ -34,6 +34,7 @@ class Conn:
     ws: WebSocket
     kind: str = "guest"  # guest | player | tv
     pid: Optional[str] = None
+    tv_admin: bool = False  # a TV that proved it holds the room's host key
     stamps: list[float] = field(default_factory=list)
 
     def rate_ok(self) -> bool:
@@ -146,7 +147,8 @@ class Hub:
         if len(self.create_log) > 5000:
             self.create_log = {k: v for k, v in self.create_log.items() if v and now - v[-1] < 3600}
         host_key = secrets.token_urlsafe(18)
-        room = Room(code=new_room_code(self.rooms), host_key_hash=hash_secret(host_key), first_joiner_hosts=from_tv)
+        room = Room(code=new_room_code(self.rooms), host_key_hash=hash_secret(host_key), tv_hosted=from_tv,
+                    host_id=TV_HOST if from_tv else None)
         if theme in self.themes:
             room.theme = theme
         self.rooms[room.code] = room
@@ -178,6 +180,8 @@ class Hub:
         targets = [only] if only else list(self.conns.get(room.code, set()))
         for c in targets:
             msg = message(room, c.kind, c.pid, online, url, events if not only else [], say if not only else [])
+            if c.kind == "tv":
+                msg["tv_admin"] = c.tv_admin
             await self.send(c, msg)
 
     # ------------------------------------------------------------ sockets
@@ -241,6 +245,9 @@ class Hub:
         if t == "hello":
             if msg.get("kind") == "tv":
                 conn.kind, conn.pid = "tv", None
+                conn.tv_admin = room.tv_hosted and room.check_host_key(msg.get("host_key"))
+                if msg.get("host_key") and not conn.tv_admin:
+                    await self.send(conn, {"t": "error", "code": "not_host"})
             else:
                 p = room.by_token(str(msg.get("token") or ""))
                 if p:
@@ -272,8 +279,12 @@ class Hub:
             await self.send(conn, {"t": "welcome", "player_id": p.id, "token": token})
             await self.push_state(room)
             return
-        if conn.kind != "player" or conn.pid is None or room.player(conn.pid) is None:
+        if conn.kind == "tv" and conn.tv_admin and t == "host":
+            actor = TV_HOST  # the TV acts for itself; it can always reassign hosting since it owns the room
+        elif conn.kind != "player" or conn.pid is None or room.player(conn.pid) is None:
             raise RoomError("not_joined")
+        else:
+            actor = conn.pid
         action_id = msg.get("id")
         if action_id is not None and (not isinstance(action_id, str) or len(action_id) > 64):
             raise RoomError("bad_request")
@@ -281,17 +292,30 @@ class Hub:
             await self.send(conn, {"t": "ack", "id": action_id, "dup": True})
             return
         if t == "act":
-            events = room.game_action(conn.pid, msg.get("a") or {})
+            if actor == TV_HOST:
+                raise RoomError("not_joined")
+            events = room.game_action(actor, msg.get("a") or {})
         elif t == "host":
             a = msg.get("a") or {}
-            if isinstance(a, dict) and a.get("type") == "rejoin_codes":
-                if conn.pid != room.host_id:
+            if not isinstance(a, dict):
+                raise RoomError("bad_request")
+            if a.get("type") == "rejoin_codes":  # host phone: the whole list, on their own screen
+                if actor == TV_HOST or actor != room.host_id:
                     raise RoomError("not_host")
                 codes = [{"id": p.id, "name": p.name, "code": p.rejoin} for p in room.players]
                 await self.send(conn, {"t": "rejoin_codes", "codes": codes})
                 return
-            kicked = a.get("player_id") if isinstance(a, dict) and a.get("type") == "kick" else None
-            events = room.host_action(conn.pid, a, self.boards, self.themes)
+            if a.get("type") == "rejoin_code":  # TV: one player's code at a time (it's a shared screen)
+                p = room.player(a.get("player_id"))
+                if actor != TV_HOST or not p:
+                    raise RoomError("not_host")
+                await self.send(conn, {"t": "rejoin_code", "player_id": p.id, "name": p.name, "code": p.rejoin})
+                return
+            if actor == TV_HOST and a.get("type") == "make_host" and room.host_id != TV_HOST:
+                # The owning TV may take hosting back, or move it, even while a phone hosts.
+                actor = room.host_id or TV_HOST
+            kicked = a.get("player_id") if a.get("type") == "kick" else None
+            events = room.host_action(actor, a, self.boards, self.themes)
             if kicked:
                 for other in list(self.conns.get(room.code, set())):
                     if other.pid == kicked:

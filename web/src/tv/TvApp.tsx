@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { GameView, RoomView, StateMsg } from '../types'
-import { DEFAULT_THEME, cardName, icon, loadTheme, onTheme, powerName, roleName, term, theme, ui } from '../theme'
+import { DEFAULT_THEME, cardName, errorText, icon, loadTheme, onTheme, powerName, roleName, term, theme, ui } from '../theme'
 import { Connection, type ConnStatus } from '../net'
 import { lobbyMusic, playSfx, say, setMuted, unlockAudio } from '../audio'
 import { beatsFor, type Beat } from './beats'
 import { createRoomAndGo } from '../newroom'
+import { Lobby } from '../phone/lobby'
 
 const MUTE_KEY = 'wow:tvmute'
 
@@ -30,9 +31,21 @@ export function TvApp(props: { code: string }) {
   }, [])
   useEffect(() => setMuted(muted), [muted])
 
-  useMemo(
+  const [drawer, setDrawer] = useState(false)
+  const [code, setCode] = useState<{ name: string; code: string } | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const conn = useMemo(
     () =>
       new Connection(props.code, 'tv', (m) => {
+        if (m.t === 'rejoin_code') {
+          setCode({ name: m.name, code: m.code })
+          return
+        }
+        if (m.t === 'error' && m.code !== 'room_missing') {
+          setError(m.code)
+          setTimeout(() => setError(null), 5000)
+          return
+        }
         if (m.t !== 'state') return
         setMsg(m)
         const room: RoomView = m.room
@@ -109,12 +122,24 @@ export function TvApp(props: { code: string }) {
     }
   }
   const names = namesRef.current
+  const tvAdmin = !!msg.tv_admin
+  const tvHost = tvAdmin && room.host_id === 'tv'
   const hushed = !!g && ['pres_discard', 'chanc_enact', 'veto_response'].includes(g.phase)
   return (
     <main class={`tv-root ${hushed ? 'hushed' : ''}`}>
       {status !== 'open' ? <div class="conn-banner">{ui('reconnecting')}</div> : null}
-      <button type="button" class="tv-mute" onClick={toggleMute}>{muted ? `🔇 ${ui('tv_unmute')}` : `🔊 ${ui('tv_mute')}`}</button>
-      {inLobby || !g ? <TvLobby room={room} /> : <Board g={g} names={names} beat={current} />}
+      <div class="tv-corner">
+        {tvAdmin ? <button type="button" class="tv-mute" onClick={() => setDrawer(true)}>👑 {ui('tv_host_button')}</button> : null}
+        <button type="button" class="tv-mute" onClick={toggleMute}>{muted ? `🔇 ${ui('tv_unmute')}` : `🔊 ${ui('tv_mute')}`}</button>
+      </div>
+      {inLobby || !g ? <TvLobby room={room} conn={tvHost ? conn : null} /> : <Board g={g} names={names} beat={current} />}
+      {drawer && tvAdmin ? (
+        <HostDrawer room={room} g={g} conn={conn} tvHost={tvHost} error={error} code={code} onCode={setCode}
+          onClose={() => {
+            setDrawer(false)
+            setCode(null)
+          }} />
+      ) : null}
       {current ? <BeatOverlay beat={current} names={names} /> : null}
       {room.paused ? <div class="tv-paused"><h2>{ui('paused')}</h2><p>{ui('paused_body')}</p></div> : null}
       <footer class="tv-credit">{theme()!.credit}</footer>
@@ -122,7 +147,7 @@ export function TvApp(props: { code: string }) {
   )
 }
 
-function TvLobby(props: { room: RoomView }) {
+function TvLobby(props: { room: RoomView; conn: Connection | null }) {
   const r = props.room
   return (
     <section class="tv-lobby">
@@ -133,10 +158,13 @@ function TvLobby(props: { room: RoomView }) {
         <p class="tv-url">{r.join_url.replace(/^https?:\/\//, '')}</p>
         <div class="tv-code">{r.code}</div>
         <p class="tv-sub">{ui('lobby_need_players', { n: r.players.length })}</p>
-        {r.first_joiner_hosts && !r.host_id ? <p class="tv-sub">👑 {ui('tv_first_host')}</p> : null}
+        {r.host_id === 'tv' ? <p class="tv-sub">👑 {ui('tv_is_host')}</p> : null}
         <ul class="tv-names">
-          {r.players.map((p) => <li class={p.online ? '' : 'off'}>{p.name}</li>)}
+          {r.players.map((p) => <li class={p.online ? '' : 'off'}>{p.id === r.host_id ? '👑 ' : ''}{p.name}</li>)}
         </ul>
+        {props.conn && r.players.length >= 5 && r.players.length <= 10 ? (
+          <button type="button" class="tv-new tv-start-btn" onClick={() => props.conn!.host({ type: 'start' })}>{ui('lobby_start')}</button>
+        ) : null}
       </div>
       <img class="tv-qr" src={`/api/rooms/${r.code}/qr.svg`} alt="" />
     </section>
@@ -350,5 +378,90 @@ function NewTripButton() {
       }}>📺 {ui('tv_new_trip')}</button>
       {err ? <p class="error">{ui('err_generic')}</p> : null}
     </>
+  )
+}
+
+/** Host controls for the TV that created the room (opened from the 👑 Host button). */
+function HostDrawer(props: {
+  room: RoomView
+  g: GameView | null
+  conn: Connection
+  tvHost: boolean
+  error: string | null
+  code: { name: string; code: string } | null
+  onCode: (c: { name: string; code: string } | null) => void
+  onClose: () => void
+}) {
+  const { room, conn, tvHost } = props
+  const [hints, setHints] = useState(false)
+  const [codeFor, setCodeFor] = useState('')
+  useEffect(() => {
+    if (!props.code) return
+    const t = setTimeout(() => props.onCode(null), 20000) // codes vanish from the shared screen
+    return () => clearTimeout(t)
+  }, [props.code])
+  const hostName = room.host_id === 'tv' ? ui('tv_the_tv') : room.players.find((p) => p.id === room.host_id)?.name ?? '?'
+  return (
+    <aside class="tv-drawer" role="dialog" aria-label={ui('tv_host_button')}>
+      <div class="modal-head">
+        <h2>👑 {ui('tv_host_button')}</h2>
+        <button type="button" class="ghost" onClick={props.onClose}>{ui('close')}</button>
+      </div>
+      {props.error ? <p class="error">{errorText(props.error)}</p> : null}
+      <section>
+        <h3>{ui('tv_current_host', { name: hostName })}</h3>
+        {!tvHost ? (
+          <button type="button" class="primary big" onClick={() => conn.host({ type: 'make_host', player_id: 'tv' })}>📺 {ui('tv_take_host')}</button>
+        ) : null}
+        <label class="field">
+          {ui('tv_make_host')}
+          <select value="" onChange={(e) => {
+            const id = (e.target as HTMLSelectElement).value
+            if (id) conn.host({ type: 'make_host', player_id: id })
+          }}>
+            <option value="">—</option>
+            {room.players.filter((p) => p.id !== room.host_id).map((p) => <option value={p.id}>{p.name}</option>)}
+          </select>
+        </label>
+      </section>
+      {tvHost && room.status === 'lobby' ? (
+        <Lobby conn={conn} room={room} meId="" isHost error={null} embedded />
+      ) : null}
+      {tvHost && room.status === 'active' ? (
+        <section class="host-panel">
+          <button type="button" class="primary big" onClick={() => conn.host({ type: room.paused ? 'resume' : 'pause' })}>
+            {room.paused ? ui('resume') : ui('pause')}
+          </button>
+        </section>
+      ) : null}
+      {tvHost && room.status === 'over' ? (
+        <section class="host-panel">
+          <label class="toggle">
+            <input type="checkbox" checked={hints} onChange={(e) => setHints((e.target as HTMLInputElement).checked)} />
+            {ui('lobby_hints')}
+          </label>
+          <button type="button" class="primary big" onClick={() => conn.host({ type: 'play_again', hints })}>{ui('play_again')}</button>
+          <button type="button" class="big" onClick={() => conn.host({ type: 'back_to_lobby' })}>{ui('new_players')}</button>
+        </section>
+      ) : null}
+      {tvHost && room.status !== 'lobby' ? (
+        <label class="toggle">
+          <input type="checkbox" checked={room.voice} onChange={(e) => conn.host({ type: 'voice', on: (e.target as HTMLInputElement).checked })} />
+          {ui('lobby_voice')}
+        </label>
+      ) : null}
+      <section>
+        <h3>{ui('tv_rejoin_title')}</h3>
+        <p class="muted">{ui('tv_rejoin_hint')}</p>
+        <div class="tv-code-row">
+          <select value={codeFor} onChange={(e) => setCodeFor((e.target as HTMLSelectElement).value)}>
+            <option value="">—</option>
+            {room.players.map((p) => <option value={p.id}>{p.name}</option>)}
+          </select>
+          <button type="button" class="big" disabled={!codeFor} onClick={() => conn.host({ type: 'rejoin_code', player_id: codeFor })}>{ui('tv_show_code')}</button>
+        </div>
+        {props.code ? <p class="tv-one-code">{props.code.name}: <code>{props.code.code}</code></p> : null}
+      </section>
+    </aside>
   )
 }

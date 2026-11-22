@@ -86,7 +86,7 @@ export interface RoomView {
   voice: boolean
   house: Record<string, (Power | null)[]>
   host_id: string | null
-  first_joiner_hosts?: boolean
+  tv_hosted?: boolean
   games_played: number
   join_url: string
   players: RoomPlayer[]
@@ -100,6 +100,7 @@ export interface StateMsg {
   events: GameEvent[]
   me?: { id: string; name: string; host: boolean }
   say?: { text: string; url?: string }[]
+  tv_admin?: boolean
 }
 
 export interface Theme {

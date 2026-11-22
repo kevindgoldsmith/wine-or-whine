@@ -254,10 +254,20 @@
     "err_bad_board": "House rules allow at most 2 babysitter-duty slots.",
     "test_tab": "TEST TAB · own player",
     "home_new_tv": "Start a new trip on this TV",
-    "home_new_tv_hint": "Shows the board on this screen; everyone joins by scanning with their phone.",
-    "tv_first_host": "The first person to join is the host",
+    "home_new_tv_hint": "Shows the board on this screen, and this screen is the host. Everyone joins by scanning with their phone.",
     "tv_new_trip": "Start a new trip",
-    "tv_new_trip_sub": "New room: everyone scans again"
+    "tv_new_trip_sub": "New room: everyone scans again",
+    "tv_is_host": "This TV is the host",
+    "tv_host_button": "Host",
+    "tv_the_tv": "this TV",
+    "tv_current_host": "Host: {name}",
+    "tv_take_host": "Make this TV the host",
+    "tv_make_host": "Make a player the host",
+    "tv_rejoin_title": "Rejoin code",
+    "tv_rejoin_hint": "For a player who switched phones. Shows one code for 20 seconds.",
+    "tv_show_code": "Show",
+    "lobby_tv_host": "The TV is the host. Waiting for it to start…",
+    "host_give_tv": "Give hosting back to the TV"
   },
   "hints": {
     "reveal": "Your role is secret. Overschedulers know each other; Chill Parents know nothing.",
