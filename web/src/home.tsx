@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks'
 import { DEFAULT_THEME, errorText, loadTheme, onTheme, theme, ui } from './theme'
-import { hostKeyKey, seatStore } from './net'
+import { createRoomAndGo } from './newroom'
 import { Credit } from './phone/common'
 
 export function Home() {
@@ -14,15 +14,11 @@ export function Home() {
   }, [])
   if (!theme()) return <main class="screen center">…</main>
   const clean = code.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4)
-  const create = async () => {
+  const create = async (fromTv: boolean) => {
     setBusy(true)
     setError(null)
     try {
-      const r = await fetch('/api/rooms', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' })
-      const body = await r.json()
-      if (!r.ok) throw new Error(body.error || 'generic')
-      seatStore.set(hostKeyKey(body.code), body.host_key)
-      location.href = `/${body.code}`
+      await createRoomAndGo(fromTv)
     } catch (e: any) {
       setError(e.message)
       setBusy(false)
@@ -33,7 +29,9 @@ export function Home() {
       <div class="hero" aria-hidden="true">🍷👶</div>
       <h1 class="display">{ui('app_title')}</h1>
       <p class="tagline">{theme()!.tagline}</p>
-      <button type="button" class="primary big" disabled={busy} onClick={create}>{ui('home_new')}</button>
+      <button type="button" class="primary big" disabled={busy} onClick={() => create(false)}>{ui('home_new')}</button>
+      <button type="button" class="big" disabled={busy} onClick={() => create(true)}>📺 {ui('home_new_tv')}</button>
+      <p class="muted">{ui('home_new_tv_hint')}</p>
       {error ? <p class="error">{errorText(error)}</p> : null}
       <form class="card form" onSubmit={(e) => {
         e.preventDefault()

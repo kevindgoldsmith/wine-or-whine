@@ -134,7 +134,7 @@ class Hub:
                     pass
 
     # ------------------------------------------------------------ rooms
-    def create_room(self, ip: str, theme: Optional[str] = None) -> tuple[Room, str]:
+    def create_room(self, ip: str, theme: Optional[str] = None, from_tv: bool = False) -> tuple[Room, str]:
         now = time.time()
         recent = [t for t in self.create_log.get(ip, []) if now - t < 3600]
         if len(recent) >= self.settings.room_creates_per_hour:
@@ -146,7 +146,7 @@ class Hub:
         if len(self.create_log) > 5000:
             self.create_log = {k: v for k, v in self.create_log.items() if v and now - v[-1] < 3600}
         host_key = secrets.token_urlsafe(18)
-        room = Room(code=new_room_code(self.rooms), host_key_hash=hash_secret(host_key))
+        room = Room(code=new_room_code(self.rooms), host_key_hash=hash_secret(host_key), first_joiner_hosts=from_tv)
         if theme in self.themes:
             room.theme = theme
         self.rooms[room.code] = room

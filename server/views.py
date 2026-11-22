@@ -23,6 +23,7 @@ def room_public(room: Room, online: set[str], join_url: str) -> dict:
         "voice": room.voice,
         "house": room.house,
         "host_id": room.host_id,
+        "first_joiner_hosts": room.first_joiner_hosts,
         "games_played": room.games_played,
         "join_url": join_url,
         "players": [

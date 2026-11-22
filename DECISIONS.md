@@ -80,3 +80,9 @@ Judgement calls made while building, newest at the bottom of each section.
   can't hint at which card it is. The veto button isn't a card and gets its own full-width row. Discreet lists
   use the same equal-row grid. Checked in Chromium at 320/390/430 px, including with deliberately mismatched
   labels.
+- **Games can be created from the TV.** "Start a new trip on this TV" (home page), plus a "Start a new trip"
+  button on the TV's game-over and room-expired screens. The TV isn't a player and can't press Start, so in a
+  TV-created room **the first phone to join becomes host** (the TV lobby says so). Anyone in the room could
+  join first, but everyone scans the same QR at the same table, and the host can hand the role on. Phone-created
+  rooms still require the creator's host key. The TV's "new trip" makes a new room (everyone rescans); "Play
+  again" with the same players stays on the host's phone.

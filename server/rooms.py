@@ -62,6 +62,8 @@ class Room:
     code: str
     host_key_hash: str
     theme: str = "wine_or_whine"
+    # Rooms created from the TV board: nobody holds the host key, so the first phone to join becomes host.
+    first_joiner_hosts: bool = False
     players: list[Player] = field(default_factory=list)
     host_id: Optional[str] = None
     status: str = "lobby"  # lobby | active | over
@@ -142,7 +144,9 @@ class Room:
         rejoin = next(c for c in (f"{secrets.randbelow(10000):04d}" for _ in range(1000)) if c not in taken)
         p = Player(id=secrets.token_hex(4), name=name, token_hash=hash_secret(token), rejoin=rejoin)
         self.players.append(p)
-        if self.host_id is None and host_key and _same(hash_secret(host_key), self.host_key_hash):
+        if self.host_id is None and (
+            self.first_joiner_hosts or (host_key and _same(hash_secret(host_key), self.host_key_hash))
+        ):
             self.host_id = p.id
         self.touch()
         return p, token

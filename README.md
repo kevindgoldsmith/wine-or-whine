@@ -9,9 +9,12 @@ shows the public board with animations, sound and voice.
 
 ## How to play (for the group)
 
-1. The host opens the site and taps **Start a new trip**, then enters their name.
+1. Either the host opens the site on their phone and taps **Start a new trip**, then enters their name; or, on
+   a TV or laptop, open the site and tap **Start a new trip on this TV**. The board appears with the QR code,
+   and the first phone to join becomes the host.
 2. Everyone else scans the QR code (or opens the link / types the 4-letter code) and enters a name.
-3. Optional: open `https://<site>/<CODE>/tv` on a TV or laptop and tap **Tap to start** (turns on sound).
+3. Optional (if the room was made on a phone): open `https://<site>/<CODE>/tv` on a TV or laptop and tap
+   **Tap to start** (turns on sound). The TV can also start a fresh room after a game (**Start a new trip**).
 4. The host puts players in seating order (clockwise) and taps **Start the trip**.
 5. Each phone says exactly what to do next. Tap **Catch me up** if you looked away.
 

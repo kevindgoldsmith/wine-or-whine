@@ -4,6 +4,7 @@ import { DEFAULT_THEME, cardName, icon, loadTheme, onTheme, powerName, roleName,
 import { Connection, type ConnStatus } from '../net'
 import { lobbyMusic, playSfx, say, setMuted, unlockAudio } from '../audio'
 import { beatsFor, type Beat } from './beats'
+import { createRoomAndGo } from '../newroom'
 
 const MUTE_KEY = 'wow:tvmute'
 
@@ -88,7 +89,14 @@ export function TvApp(props: { code: string }) {
       </main>
     )
   }
-  if (status === 'gone') return <main class="tv-root tv-start"><p class="tv-big">{ui('room_missing')}</p></main>
+  if (status === 'gone') {
+    return (
+      <main class="tv-root tv-start">
+        <p class="tv-big">{ui('room_missing')}</p>
+        <NewTripButton />
+      </main>
+    )
+  }
   if (!msg || !room) return <main class="tv-root tv-start"><p class="tv-big">{ui('connecting')}</p></main>
 
   const toggleMute = () => {
@@ -125,6 +133,7 @@ function TvLobby(props: { room: RoomView }) {
         <p class="tv-url">{r.join_url.replace(/^https?:\/\//, '')}</p>
         <div class="tv-code">{r.code}</div>
         <p class="tv-sub">{ui('lobby_need_players', { n: r.players.length })}</p>
+        {r.first_joiner_hosts && !r.host_id ? <p class="tv-sub">👑 {ui('tv_first_host')}</p> : null}
         <ul class="tv-names">
           {r.players.map((p) => <li class={p.online ? '' : 'off'}>{p.name}</li>)}
         </ul>
@@ -222,6 +231,7 @@ function Board(props: { g: GameView; names: string[]; beat?: Beat }) {
             </div>
           </div>
           {over ? <TvAwards g={g} names={names} /> : null}
+          {over ? <div class="tv-newtrip"><NewTripButton /><span>{ui('tv_new_trip_sub')}</span></div> : null}
         </div>
         <div class="tv-table">
           <div class="tv-oval" />
@@ -321,5 +331,24 @@ function Confetti() {
     <div class="confetti" aria-hidden="true">
       {bits.map((c) => <i style={{ left: `${c.left}%`, animationDelay: `${c.delay}s`, background: c.color }} />)}
     </div>
+  )
+}
+
+function NewTripButton() {
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState(false)
+  return (
+    <>
+      <button type="button" class="tv-new" disabled={busy} onClick={async () => {
+        setBusy(true)
+        try {
+          await createRoomAndGo(true)
+        } catch {
+          setErr(true)
+          setBusy(false)
+        }
+      }}>📺 {ui('tv_new_trip')}</button>
+      {err ? <p class="error">{ui('err_generic')}</p> : null}
+    </>
   )
 }

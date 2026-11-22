@@ -94,13 +94,15 @@ def create_app(settings: Optional[Settings] = None, storage=None, tts: Optional[
     @app.post("/api/rooms")
     async def create_room(request: Request):
         hub = hub_of(request)
-        theme = None
+        theme, from_tv = None, False
         with contextlib.suppress(Exception):
             body = await request.json()
-            theme = body.get("theme") if isinstance(body, dict) else None
+            if isinstance(body, dict):
+                theme = body.get("theme")
+                from_tv = body.get("from") == "tv"
         ip = request.client.host if request.client else "?"
         try:
-            room, host_key = hub.create_room(ip, theme)
+            room, host_key = hub.create_room(ip, theme, from_tv)
         except RoomError as exc:
             return JSONResponse({"error": exc.code}, status_code=429 if exc.code == "rate_limited" else 503)
         await hub.save(room)

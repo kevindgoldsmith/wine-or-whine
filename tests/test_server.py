@@ -462,3 +462,34 @@ def test_logs_never_contain_secrets(client, caplog):
         assert f"={c['code']}" not in text and f" {c['code']} " not in text
     for word in ("chief", "chill", "'over'", "hand=", "votes", "team"):
         assert word not in text
+
+
+# ---------------------------------------------------------------- rooms created from the TV
+
+def test_tv_created_room_first_joiner_becomes_host(client):
+    r = client.post("/api/rooms", json={"from": "tv"}).json()
+    tv = Phone(client, r["code"])
+    tv.send(t="hello", kind="tv")
+    st = tv.recv_until("state")
+    assert st["room"]["first_joiner_hosts"] is True and st["room"]["host_id"] is None
+    first = join(client, r["code"], "Ann")  # no host key: the TV kept it
+    second = join(client, r["code"], "Ben")
+    assert first.state["me"]["host"] is True
+    assert second.wait_state(lambda m: len(m["room"]["players"]) == 2)["me"]["host"] is False
+    tv.wait_state(lambda m: m["room"]["host_id"] == first.pid)
+
+
+def test_phone_created_room_still_needs_the_host_key(client):
+    code, key = new_room(client)
+    stranger = join(client, code, "Stranger")
+    assert stranger.state["me"]["host"] is False
+    owner = join(client, code, "Owner", key)
+    assert owner.state["me"]["host"] is True
+
+
+def test_old_snapshots_without_the_flag_still_load():
+    room = Room(code="ABCD", host_key_hash=hash_secret("k"))
+    d = room.to_dict()
+    del d["first_joiner_hosts"]  # snapshot written before TV-created rooms existed
+    restored = Room.from_dict(d)
+    assert restored.first_joiner_hosts is False

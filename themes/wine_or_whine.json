@@ -252,7 +252,12 @@
     "err_illegal": "That move isn't allowed right now.",
     "err_room_missing": "That room doesn't exist (or it expired).",
     "err_bad_board": "House rules allow at most 2 babysitter-duty slots.",
-    "test_tab": "TEST TAB · own player"
+    "test_tab": "TEST TAB · own player",
+    "home_new_tv": "Start a new trip on this TV",
+    "home_new_tv_hint": "Shows the board on this screen; everyone joins by scanning with their phone.",
+    "tv_first_host": "The first person to join is the host",
+    "tv_new_trip": "Start a new trip",
+    "tv_new_trip_sub": "New room: everyone scans again"
   },
   "hints": {
     "reveal": "Your role is secret. Overschedulers know each other; Chill Parents know nothing.",

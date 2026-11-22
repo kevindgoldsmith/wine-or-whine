@@ -86,6 +86,7 @@ export interface RoomView {
   voice: boolean
   house: Record<string, (Power | null)[]>
   host_id: string | null
+  first_joiner_hosts?: boolean
   games_played: number
   join_url: string
   players: RoomPlayer[]
