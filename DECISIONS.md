@@ -44,3 +44,10 @@ Judgement calls made while building, newest at the bottom of each section.
 - **Rules hints** are on for the first game; "Play again" turns them off unless the host ticks the box.
 - **Discreet mode also strips emoji from choice text** (e.g. "😴 Sleeping in" becomes "Sleeping in").
 - **The host menu (⋯)** holds pause/resume, rejoin codes and the voice toggle during a game.
+
+## TV board
+- **Beats never block the game and never lag far behind.** If events pile up, beats play faster and only the
+  newest six are kept; at game over the TV skips straight to the ending.
+- **The TV shows a persistent 🤫 on the table** while cards are with the government, plus a full-screen "Shh"
+  beat when the handoff starts.
+- **Superlatives appear on the TV and on every phone** at game over.
