@@ -36,7 +36,7 @@ class Server:
         self.proc: subprocess.Popen | None = None
 
     def start(self):
-        env = dict(os.environ, SQLITE_PATH=self.db, DATABASE_URL="", PING_SECONDS="2", TTS_PROVIDER="none",
+        env = dict(os.environ, SQLITE_PATH=self.db, DATABASE_URL=os.environ.get("E2E_DATABASE_URL", ""), PING_SECONDS="2", TTS_PROVIDER="none",
                    PUBLIC_BASE_URL="")
         self.proc = subprocess.Popen(
             [sys.executable, "-m", "uvicorn", "server.main:app", "--host", "127.0.0.1", "--port", str(self.port),

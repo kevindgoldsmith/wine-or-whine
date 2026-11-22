@@ -4,7 +4,6 @@ WORKDIR /web
 COPY web/package.json web/package-lock.json ./
 RUN npm ci
 COPY web/ ./
-COPY themes/ /themes/
 RUN npm run build
 
 # --- Stage 2: Python server ---
@@ -20,5 +19,5 @@ COPY config/ config/
 COPY static/ static/
 COPY --from=web /web/dist web/dist
 EXPOSE 8000
-# Shell form so $PORT expands. One worker: live room state is in memory (see DECISIONS.md).
-CMD uvicorn server.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*' --ws-max-size 16384 --timeout-graceful-shutdown 5
+# Shell form so $PORT expands; `exec` makes uvicorn PID 1 so it receives SIGTERM. One worker: live room state is in memory (see DECISIONS.md).
+CMD exec uvicorn server.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*' --ws-max-size 16384 --timeout-graceful-shutdown 5

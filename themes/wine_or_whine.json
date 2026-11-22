@@ -236,7 +236,22 @@
     "deck_word": "Deck",
     "discard_word": "Discard",
     "hints_on": "Hints on",
-    "seat": "Seat {n}"
+    "seat": "Seat {n}",
+    "err_generic": "Something went wrong. Try again.",
+    "err_bad_name": "Please enter a name.",
+    "err_game_started": "This trip has already started. Ask the host for your rejoin code.",
+    "err_room_full": "This trip is full (10 players max).",
+    "err_name_taken": "Someone already has that name. Add an initial?",
+    "err_rate_limited": "Too many tries. Wait a few minutes.",
+    "err_too_many_rooms": "The server is busy. Try again later.",
+    "err_bad_code": "That rejoin code doesn't match.",
+    "err_bad_token": "Your saved seat wasn't found. Join again, or use a rejoin code.",
+    "err_not_host": "Only the host can do that.",
+    "err_need_players": "You need 5 to 10 players.",
+    "err_paused": "The game is paused.",
+    "err_illegal": "That move isn't allowed right now.",
+    "err_room_missing": "That room doesn't exist (or it expired).",
+    "err_bad_board": "House rules allow at most 2 babysitter-duty slots."
   },
   "hints": {
     "reveal": "Your role is secret. Overschedulers know each other; Chill Parents know nothing.",

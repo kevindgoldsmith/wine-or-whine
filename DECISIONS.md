@@ -51,3 +51,12 @@ Judgement calls made while building, newest at the bottom of each section.
 - **The TV shows a persistent 🤫 on the table** while cards are with the government, plus a full-screen "Shh"
   beat when the handoff starts.
 - **Superlatives appear on the TV and on every phone** at game over.
+
+## Audio and polish
+- **Phones never speak or play announcements**; they only make a quiet tap and a short vibration.
+- **Placeholder sound effects are synthesized in the browser**, so `static/sfx/` ships empty except for a
+  `manifest.json` listing which real files exist (avoids 404 probes for every slot).
+- **The Docker `CMD` uses `exec`** (still shell form, so `$PORT` expands) so uvicorn is PID 1 and receives
+  Railway's SIGTERM; otherwise `/bin/sh` swallows it and the graceful 1012 close never happens.
+- **`scripts/smoke.py`** is the post-deploy smoke test; `DELETE /api/rooms/{code}` (host key required, never an
+  active game) lets it clean up its test room.
