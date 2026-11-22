@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks'
 import { DEFAULT_THEME, errorText, loadTheme, onTheme, theme, ui } from './theme'
-import { hostKeyKey, store } from './net'
+import { hostKeyKey, seatStore } from './net'
 import { Credit } from './phone/common'
 
 export function Home() {
@@ -21,7 +21,7 @@ export function Home() {
       const r = await fetch('/api/rooms', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' })
       const body = await r.json()
       if (!r.ok) throw new Error(body.error || 'generic')
-      store.set(hostKeyKey(body.code), body.host_key)
+      seatStore.set(hostKeyKey(body.code), body.host_key)
       location.href = `/${body.code}`
     } catch (e: any) {
       setError(e.message)

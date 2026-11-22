@@ -68,3 +68,10 @@ Judgement calls made while building, newest at the bottom of each section.
   old container serving until the new one passed `/livez` (~33 s), then the old one closed every socket with
   1012. All 8 phones and the TV were back on the new container within 1.03 s, in the same day and phase, and
   the game played on to the end.
+
+## Testing aids
+- **`?test` makes a tab its own player.** Seat token, host key and remembered name go to `sessionStorage` (per
+  tab) instead of `localStorage` (per browser). The flag sticks for the tab's lifetime, so navigation and
+  reloads keep it. It's opt-in per URL rather than a build flag because it only affects the visitor's own
+  browser: anyone could already join extra seats from another device, so it grants nothing new. The discreet
+  preference stays per browser.

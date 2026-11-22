@@ -251,7 +251,8 @@
     "err_paused": "The game is paused.",
     "err_illegal": "That move isn't allowed right now.",
     "err_room_missing": "That room doesn't exist (or it expired).",
-    "err_bad_board": "House rules allow at most 2 babysitter-duty slots."
+    "err_bad_board": "House rules allow at most 2 babysitter-duty slots.",
+    "test_tab": "TEST TAB · own player"
   },
   "hints": {
     "reveal": "Your role is secret. Overschedulers know each other; Chill Parents know nothing.",

@@ -379,3 +379,4 @@ html.tv-mode body { font-size: clamp(16px, 1.6vw, 30px); overflow: hidden; }
 @keyframes toast { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-15deg) translateY(-10px); } }
 @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
 @keyframes dash { to { stroke-dashoffset: -24; } }
+.test-badge { position: fixed; left: 8px; bottom: 8px; z-index: 80; background: #2a1e24; color: #fff; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; opacity: 0.8; pointer-events: none; }

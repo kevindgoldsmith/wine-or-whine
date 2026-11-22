@@ -15,6 +15,11 @@ shows the public board with animations, sound and voice.
 4. The host puts players in seating order (clockwise) and taps **Start the trip**.
 5. Each phone says exactly what to do next. Tap **Catch me up** if you looked away.
 
+**Testing on one device:** add `?test` to the URL (e.g. `https://<site>/?test` or `https://<site>/ABCD?test`).
+That tab then remembers its seat in per-tab storage, so every `?test` tab or window in the same browser joins
+as a separate player (marked "TEST TAB" in the corner). Reloading a test tab keeps its seat; closing it loses
+it (use the rejoin code). Without `?test`, all tabs in a browser share one seat, as on a real phone.
+
 Players who switch phones: the host opens **⋯ → Show rejoin codes**, and the player picks their name and enters
 their 4-digit code. Phones that lock, reload or drop off Wi-Fi rejoin on their own.
 

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { StateMsg } from '../types'
 import { DEFAULT_THEME, errorText, loadTheme, onTheme, theme, ui } from '../theme'
-import { Connection, type ConnStatus, store } from '../net'
+import { Connection, type ConnStatus, isTestTab, seatStore, store, tokenKey } from '../net'
 import { buzz, GameCtx, Modal } from './common'
 import { JoinScreen, Lobby, RejoinScreen } from './lobby'
 import { CatchUp, GameOver, Header, OutScreen, RoleReveal, TurnArea } from './game'
@@ -47,7 +47,7 @@ export function PhoneApp(props: { code: string }) {
           } else if (m.t === 'rejoin_codes') {
             setCodes(m.codes)
           } else if (m.t === 'signed_out') {
-            store.set(`wow:${props.code}:token`, null)
+            seatStore.set(tokenKey(props.code), null)
           }
         },
         setStatus,
@@ -88,7 +88,12 @@ export function PhoneApp(props: { code: string }) {
   if (status === 'gone') return <main class="screen center"><h1 class="display">{ui('app_title')}</h1><p>{ui('room_missing')}</p><a class="primary big" href="/">{ui('back')}</a></main>
   if (!msg || !room) return <main class="screen center"><p class="status-line">{ui('connecting')}</p></main>
 
-  const banner = status !== 'open' ? <div class="conn-banner">{ui('reconnecting')}</div> : null
+  const banner = (
+    <>
+      {status !== 'open' ? <div class="conn-banner">{ui('reconnecting')}</div> : null}
+      {isTestTab() ? <div class="test-badge">{ui('test_tab')}</div> : null}
+    </>
+  )
   const ctx = { discreet, hints: room.hints, names, me: mySeat }
   const discreetToggle = (
     <button type="button" class={`small toggle-btn ${discreet ? 'on' : ''}`} aria-pressed={discreet} onClick={() => setDiscreet(!discreet)}>

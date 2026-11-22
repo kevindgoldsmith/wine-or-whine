@@ -2,17 +2,17 @@ import { useEffect, useState } from 'preact/hooks'
 import type { Power, RoomView } from '../types'
 import { errorText, icon, term, ui } from '../theme'
 import type { Connection } from '../net'
-import { store, hostKeyKey } from '../net'
+import { seatStore, hostKeyKey } from '../net'
 import { Credit } from './common'
 
 export function JoinScreen(props: { conn: Connection; room: RoomView; error: string | null; onRejoin: () => void }) {
-  const [name, setName] = useState(store.get('wow:name') ?? '')
+  const [name, setName] = useState(seatStore.get('wow:name') ?? '')
   const submit = (e: Event) => {
     e.preventDefault()
     const n = name.trim()
     if (!n) return
-    store.set('wow:name', n)
-    props.conn.join(n, store.get(hostKeyKey(props.room.code)))
+    seatStore.set('wow:name', n)
+    props.conn.join(n, seatStore.get(hostKeyKey(props.room.code)))
   }
   return (
     <main class="screen center">

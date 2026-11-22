@@ -25,6 +25,52 @@ export const store = {
   },
 }
 
+/**
+ * Test mode (open any page with `?test`): this tab keeps its seat token, host key and name in
+ * sessionStorage, which is per tab, so several tabs in one browser can each join as a different player.
+ * The flag sticks for the life of the tab, so in-app navigation and reloads keep it. Normal play keeps
+ * using localStorage, so a phone that reloads or switches tabs resumes its seat.
+ */
+const TEST_FLAG = 'wow:testtab'
+
+export function isTestTab(): boolean {
+  try {
+    if (new URLSearchParams(globalThis.location?.search ?? '').has('test')) sessionStorage.setItem(TEST_FLAG, '1')
+    return sessionStorage.getItem(TEST_FLAG) === '1'
+  } catch {
+    return false
+  }
+}
+
+function backing(): Storage | null {
+  try {
+    return isTestTab() ? sessionStorage : localStorage
+  } catch {
+    return null
+  }
+}
+
+/** Storage for anything that identifies *this player*: per tab in test mode, per browser otherwise. */
+export const seatStore = {
+  get(k: string): string | null {
+    try {
+      return backing()?.getItem(k) ?? null
+    } catch {
+      return null
+    }
+  },
+  set(k: string, v: string | null) {
+    try {
+      const b = backing()
+      if (!b) return
+      if (v === null) b.removeItem(k)
+      else b.setItem(k, v)
+    } catch {
+      /* private mode: fine */
+    }
+  },
+}
+
 export const tokenKey = (code: string) => `wow:${code}:token`
 export const hostKeyKey = (code: string) => `wow:${code}:host`
 
@@ -80,7 +126,7 @@ export class Connection {
       if (ws !== this.ws) return
       this.attempt = 0
       this.lastSeen = Date.now()
-      const token = this.kind === 'player' ? store.get(tokenKey(this.code)) : null
+      const token = this.kind === 'player' ? seatStore.get(tokenKey(this.code)) : null
       ws.send(JSON.stringify({ t: 'hello', kind: this.kind, token }))
       for (const msg of this.pending.values()) ws.send(JSON.stringify(msg))
       this.setStatus('open')
@@ -103,8 +149,8 @@ export class Connection {
         this.pending.delete(msg.id)
         if (quiet && msg.t === 'error') return
       }
-      if (msg.t === 'welcome' && msg.token) store.set(tokenKey(this.code), msg.token)
-      if (msg.t === 'kicked') store.set(tokenKey(this.code), null)
+      if (msg.t === 'welcome' && msg.token) seatStore.set(tokenKey(this.code), msg.token)
+      if (msg.t === 'kicked') seatStore.set(tokenKey(this.code), null)
       if (msg.t === 'error' && msg.code === 'room_missing') {
         this.closed = true
         this.setStatus('gone')
@@ -177,6 +223,6 @@ export class Connection {
   }
 
   hello() {
-    this.send({ t: 'hello', kind: this.kind, token: store.get(tokenKey(this.code)) })
+    this.send({ t: 'hello', kind: this.kind, token: seatStore.get(tokenKey(this.code)) })
   }
 }
