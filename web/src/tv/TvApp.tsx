@@ -171,9 +171,33 @@ function TvLobby(props: { room: RoomView; conn: Connection | null }) {
   )
 }
 
-function seatPos(i: number, n: number) {
-  const a = -Math.PI / 2 + (i * 2 * Math.PI) / n
-  return { x: 50 + 42 * Math.cos(a), y: 50 + 38 * Math.sin(a) }
+// Seats sit at equal distances along a rounded-rectangle "table" (a superellipse), starting top centre and
+// going clockwise. Equal arc spacing (rather than equal angles) keeps neighbours from bunching up.
+const seatCache = new Map<string, { x: number; y: number }[]>()
+function seatPos(i: number, n: number, aspect = 1.15) {
+  // aspect = width / height of the seats box as measured on screen, so spacing is even in real pixels.
+  const key = `${n}:${aspect.toFixed(2)}`
+  if (!seatCache.has(key)) {
+    const P = 4, ASPECT = aspect // superellipse exponent; measured box shape
+    const pts: { x: number; y: number }[] = []
+    for (let k = 0; k <= 1440; k++) {
+      const t = -Math.PI / 2 + (k / 1440) * 2 * Math.PI
+      const c = Math.cos(t), sn = Math.sin(t)
+      pts.push({ x: Math.sign(c) * Math.abs(c) ** (2 / P), y: Math.sign(sn) * Math.abs(sn) ** (2 / P) })
+    }
+    const cum = [0]
+    for (let k = 1; k < pts.length; k++) cum.push(cum[k - 1] + Math.hypot((pts[k].x - pts[k - 1].x) * ASPECT, pts[k].y - pts[k - 1].y))
+    const total = cum[cum.length - 1]
+    const out: { x: number; y: number }[] = []
+    let k = 0
+    for (let s = 0; s < n; s++) {
+      const target = (s / n) * total
+      while (cum[k] < target) k++
+      out.push({ x: 50 + 50 * pts[k].x, y: 50 + 50 * pts[k].y })
+    }
+    seatCache.set(key, out)
+  }
+  return seatCache.get(key)![i]
 }
 
 function statusText(g: GameView, names: string[]) {
@@ -236,13 +260,26 @@ function Board(props: { g: GameView; names: string[]; beat?: Beat }) {
   const over = g.phase === 'game_over'
   const n = g.n
   const nom = g.nominee ?? (['pres_discard', 'chanc_enact', 'veto_response'].includes(g.phase) ? g.chancellor : null)
-  const p1 = seatPos(g.president, n)
-  const p2 = nom !== null ? seatPos(nom, n) : null
+  const seatsRef = useRef<HTMLDivElement>(null)
+  const [aspect, setAspect] = useState(1.15)
+  useEffect(() => {
+    const el = seatsRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver(() => {
+      const r = el.getBoundingClientRect()
+      if (r.width > 0 && r.height > 0) setAspect(Math.round((r.width / r.height) * 20) / 20)
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const p1 = seatPos(g.president, n, aspect)
+  const p2 = nom !== null ? seatPos(nom, n, aspect) : null
   return (
-    <section class="tv-board">
+    <section class={`tv-board ${over ? 'over' : ''}`}>
       <header class="tv-top">
         <div class="tv-day">{over ? ui('game_over') : ui('header_day', { n: Math.max(g.day, 1) })}</div>
-        <div class="tv-status">{over ? `${theme()!.winner_title[g.winner!]} ${theme()!.win[g.win_reason!]}` : statusText(g, names)}</div>
+        <div class="tv-status">{over ? <><strong>{theme()!.winner_title[g.winner!]}</strong> {theme()!.win[g.win_reason!]}</> : statusText(g, names)}</div>
+        {over ? <div class="tv-newtrip" title={ui('tv_new_trip_sub')}><NewTripButton /></div> : null}
       </header>
       <div class="tv-main">
         <div class="tv-tracks">
@@ -259,17 +296,17 @@ function Board(props: { g: GameView; names: string[]; beat?: Beat }) {
             </div>
           </div>
           {over ? <TvAwards g={g} names={names} /> : null}
-          {over ? <div class="tv-newtrip"><NewTripButton /><span>{ui('tv_new_trip_sub')}</span></div> : null}
         </div>
         <div class="tv-table">
           <div class="tv-oval" />
+          <div class="tv-seats" ref={seatsRef}>
           {p2 && !over ? (
             <svg class="tv-arrow" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
               <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} />
             </svg>
           ) : null}
           {names.map((name, i) => {
-            const pos = seatPos(i, n)
+            const pos = seatPos(i, n, aspect)
             const role = g.roles?.[i]
             return (
               <div class={`tv-seat ${g.alive[i] ? '' : 'out'} ${over && role ? 'flip role-' + role : ''}`} style={{ left: `${pos.x}%`, top: `${pos.y}%` }}>
@@ -286,8 +323,11 @@ function Board(props: { g: GameView; names: string[]; beat?: Beat }) {
               </div>
             )
           })}
-          {g.veto_unlocked && !over ? <div class="tv-veto-note">✋ {ui('veto_unlocked')}</div> : null}
-          {['pres_discard', 'chanc_enact', 'veto_response'].includes(g.phase) ? <div class="tv-shh-note">{icon('handoff')}</div> : null}
+          <div class="tv-center">
+            {['pres_discard', 'chanc_enact', 'veto_response'].includes(g.phase) ? <div class="tv-shh-note">{icon('handoff')}</div> : null}
+            {g.veto_unlocked && !over ? <div class="tv-veto-note">✋ {ui('veto_unlocked')}</div> : null}
+          </div>
+          </div>
         </div>
       </div>
     </section>

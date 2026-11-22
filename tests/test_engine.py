@@ -620,3 +620,14 @@ def test_superlatives():
     assert awards["poker_face"]["seats"] == [1]
     assert awards["never_trusted"]["seats"] in ([1], [1, 3])
     assert awards["one_more_stop"]["seats"] == [2, 4]
+
+
+def test_superlative_with_four_way_tie_is_dropped():
+    s = make(5, pres=0, roles=roles_with_chief(5, chief=1))
+    s, _ = act(s, 0, type="nominate", target=2)
+    s, _ = vote(s, yes_seats={0})  # four players vote No once each: a 4-way tie for "Never Trusted Anyone"
+    s.deck = ["B"] * 3 + s.deck
+    s.breezy = 4
+    s, _ = govern(s, chanc=3)
+    assert s.winner == "chill"
+    assert "never_trusted" not in {a["key"] for a in s.superlatives}

@@ -117,31 +117,36 @@ input, select {
 .codes li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 1.1rem; }
 .codes code { font-size: 1.3rem; font-weight: 700; letter-spacing: 0.15em; }
 
-/* ---------- header */
-.game-header { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--line); padding: 8px 0; }
-.header-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.header-row.buttons { margin-top: 6px; }
-.day { font-family: var(--display); font-size: 1.3rem; color: var(--wine); }
-.track { display: inline-flex; align-items: center; gap: 3px; }
-.pip { width: 12px; height: 12px; border-radius: 3px; border: 2px solid var(--line); display: inline-block; }
+/* ---------- header: two fixed rows that never wrap (status row, then three equal buttons) */
+.game-header { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--line); padding: 6px 0; }
+.header-row { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; min-width: 0; }
+.header-row.buttons { margin-top: 6px; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr) auto; gap: 6px; }
+.header-row.buttons > * { min-width: 0; }
+.header-row.buttons button, .header-row.buttons .hold-small { min-height: 44px; padding: 4px 6px; font-size: 0.82rem; line-height: 1.15; }
+.day { font-family: var(--display); font-size: 1.2rem; color: var(--wine); white-space: nowrap; }
+.track { display: inline-flex; align-items: center; gap: 2px; flex: none; }
+.track-icon { font-size: 0.95rem; margin-right: 1px; }
+.pip { width: 10px; height: 10px; border-radius: 3px; border: 2px solid var(--line); display: inline-block; flex: none; }
 .track-B .pip.filled { background: var(--sage); border-color: var(--sage); }
 .track-O .pip.filled { background: var(--coral); border-color: var(--coral); }
-.meter { display: inline-flex; gap: 3px; margin-left: auto; }
+.meter { display: inline-flex; gap: 2px; margin-left: auto; flex: none; }
 .meter-pip { border-radius: 50%; }
 .meter-pip.filled { background: var(--gold); border-color: var(--gold); }
 .toggle-btn.on { background: var(--ink); color: #fff; }
+/* Short screens (landscape phones): don't pin the header over the prompt. */
+@media (max-height: 520px) { .game-header { position: static; } }
 
 /* ---------- hold to reveal */
 .hold { border-radius: var(--radius); background: var(--ink); color: #fff; min-height: 120px; display: flex; align-items: center; justify-content: center; text-align: center; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none; cursor: pointer; padding: 12px; }
 .hold.shown { background: var(--card); color: var(--fg); border: 2px solid var(--ink); }
 .hold-cover { font-weight: 700; font-size: 1.1rem; }
-.hold-small { min-height: 44px; padding: 4px 12px; font-size: 0.9rem; flex: 1; }
-.hold-small.shown { position: fixed; inset: 15% 16px auto; z-index: 30; min-height: 200px; }
+.hold-small { min-height: 44px; padding: 4px 6px; font-size: 0.82rem; }
+.hold-small.shown { position: fixed; inset: 15% 16px auto; z-index: 30; min-height: 200px; font-size: 1rem; line-height: 1.45; padding: 12px; }
 .role-hold { min-height: 280px; }
 .result-hold { min-height: 160px; }
 
 .role-card { padding: 8px; }
-.role-icon { font-size: 3rem; }
+.role-icon { font-size: 3rem; line-height: 1.25; }
 .role-card h2 { font-family: var(--display); font-size: 1.8rem; }
 .role-chill h2 { color: var(--sage); }
 .role-over h2, .role-chief h2 { color: var(--coral); }
@@ -262,76 +267,94 @@ html.discreet .paused-overlay { background: rgba(23, 20, 26, 0.97); }
 }
 
 /* =================================================================== TV board */
-html.tv-mode body { font-size: clamp(16px, 1.6vw, 30px); overflow: hidden; }
-.tv-root { position: relative; height: 100vh; width: 100vw; overflow: hidden; background: var(--cream); color: var(--ink); display: flex; flex-direction: column; }
+/* The TV is laid out in rem, and the ROOT font size (rem follows <html>, not <body>) scales with both width
+   and height, so every 16:9 screen shows the same layout, just bigger or smaller, and nothing falls off a
+   screen that can't scroll: 1280×720 → 16px, 1920×1080 → 24px, 3840×2160 → 40px, 960×540 → 12px. */
+html.tv-mode { font-size: clamp(10px, min(1.25vw, 2.22vh), 40px); }
+html.tv-mode body { font-size: 1rem; overflow: hidden; }
+.tv-root { position: relative; height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; background: var(--cream); color: var(--ink); display: flex; flex-direction: column; }
 .tv-root.hushed { background: #efe5d6; }
-.tv-start { align-items: center; justify-content: center; text-align: center; cursor: pointer; gap: 1rem; }
-.tv-title { font-family: var(--display); color: var(--wine); font-size: 4.5rem; margin: 0; }
+.tv-start { align-items: center; justify-content: center; text-align: center; cursor: pointer; gap: 1rem; padding: 1rem; }
+.tv-title { font-family: var(--display); color: var(--wine); font-size: 3rem; margin: 0; line-height: 1.05; }
 .tv-tap { font-size: 2rem; padding: 0.6em 1.6em; background: var(--wine); color: #fff; border: none; border-radius: 999px; animation: pulse 1.6s ease-in-out infinite; }
 .tv-big { font-size: 2.2rem; }
-.tv-corner { position: absolute; top: 0.6rem; right: 0.8rem; z-index: 45; display: flex; gap: 0.5rem; }
-.tv-mute { min-height: 0; padding: 0.3em 0.8em; font-size: 0.9rem; }
-.tv-credit { position: absolute; bottom: 0.4rem; left: 0; right: 0; text-align: center; font-size: 0.85rem; color: var(--muted); }
+.tv-corner { position: absolute; top: 0.6rem; right: 0.8rem; z-index: 60; display: flex; gap: 0.5rem; }
+.tv-mute { min-height: 0; padding: 0.3em 0.8em; font-size: 0.8rem; white-space: nowrap; }
+.tv-credit { position: absolute; bottom: 0.3rem; left: 0; right: 0; text-align: center; font-size: 0.7rem; line-height: 1.2; color: var(--muted); pointer-events: none; }
 .tv-paused { position: absolute; inset: 0; background: rgba(248, 241, 231, 0.96); z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 2rem; }
 
-.tv-lobby { flex: 1; display: flex; align-items: center; justify-content: space-around; padding: 2rem 4rem; gap: 3rem; }
-.tv-lobby-left { display: flex; flex-direction: column; gap: 0.4rem; max-width: 50%; }
-.tv-tagline { font-size: 1.4rem; color: var(--muted); }
-.tv-join { font-size: 1.2rem; margin-top: 1rem; }
-.tv-url { font-size: 1.6rem; font-weight: 700; color: var(--wine); }
-.tv-code { font-family: var(--display); font-size: 5rem; letter-spacing: 0.25em; color: #fff; background: var(--wine); border-radius: 1rem; padding: 0 0.4em; align-self: flex-start; }
-.tv-sub { font-size: 1.2rem; font-weight: 600; }
-.tv-names { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.tv-names li { background: var(--paper); border: 2px solid var(--line); border-radius: 999px; padding: 0.2em 0.9em; font-size: 1.3rem; animation: pop-in 0.4s ease-out; }
+.tv-lobby { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: space-around; padding: 1.2rem 3rem 1.8rem; gap: 2.5rem; }
+.tv-lobby-left { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; min-width: 0; max-width: 55%; }
+.tv-tagline { font-size: 1.2rem; color: var(--muted); }
+.tv-join { font-size: 1.1rem; margin-top: 0.6rem; }
+.tv-url { font-size: 1.4rem; font-weight: 700; color: var(--wine); overflow-wrap: anywhere; }
+.tv-code { font-family: var(--display); font-size: 3.2rem; line-height: 1.2; letter-spacing: 0.25em; color: #fff; background: var(--wine); border-radius: 1rem; padding: 0 0.4em; align-self: flex-start; }
+.tv-sub { font-size: 1.1rem; font-weight: 600; }
+.tv-names { list-style: none; padding: 0; margin: 0.3rem 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tv-names li { background: var(--paper); border: 2px solid var(--line); border-radius: 999px; padding: 0.1em 0.8em; font-size: 1.05rem; animation: pop-in 0.4s ease-out; }
 .tv-names li.off { opacity: 0.5; }
-.tv-qr { width: min(38vw, 70vh); height: min(38vw, 70vh); background: #fff; border-radius: 1.2rem; padding: 0.6rem; }
+.tv-qr { flex: none; width: min(38vw, 68vh); height: min(38vw, 68vh); background: #fff; border-radius: 1.2rem; padding: 0.6rem; }
 
-.tv-board { flex: 1; display: flex; flex-direction: column; padding: 0.8rem 1.4rem 1.6rem; min-height: 0; }
-.tv-top { display: flex; align-items: baseline; gap: 1.5rem; padding-right: 9rem; }
-.tv-day { font-family: var(--display); font-size: 2.6rem; color: var(--wine); font-weight: 700; white-space: nowrap; }
-.tv-status { font-size: 1.5rem; font-weight: 600; }
-.tv-main { flex: 1; display: grid; grid-template-columns: 1.15fr 1fr; gap: 1.2rem; min-height: 0; }
-.tv-tracks { display: flex; flex-direction: column; gap: 0.9rem; justify-content: center; }
-.tv-track-label { font-weight: 700; font-size: 1.2rem; margin-bottom: 0.3rem; }
-.tv-slots { display: flex; gap: 0.5rem; }
-.tv-slot { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.2rem; }
-.tv-slot-card { width: 100%; aspect-ratio: 3 / 4; border-radius: 0.6rem; border: 3px dashed var(--line); display: flex; align-items: center; justify-content: center; font-size: 2rem; background: var(--paper); opacity: 0.85; }
+.tv-board { flex: 1; display: flex; flex-direction: column; padding: 0.5rem 1.2rem 1.4rem; min-height: 0; }
+.tv-top { display: flex; align-items: center; gap: 1.2rem; padding-right: 11rem; min-height: 3rem; }
+.tv-day { font-family: var(--display); font-size: 2.2rem; color: var(--wine); font-weight: 700; white-space: nowrap; }
+.tv-status { font-size: 1.25rem; font-weight: 600; flex: 1; min-width: 0; line-height: 1.2; }
+.tv-newtrip { flex: none; }
+.tv-newtrip .tv-new { font-size: 1rem; padding: 0.35em 1em; }
+.tv-board.over .tv-status { font-size: 1rem; }
+.tv-board.over .tv-day { font-size: 1.8rem; }
+.tv-board.over .tv-seat { padding: 0.15rem 0.45rem; max-width: 8rem; }
+.tv-board.over .tv-role { font-size: 0.68rem; }
+.tv-main { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.2rem; min-height: 0; }
+.tv-tracks { display: flex; flex-direction: column; gap: 0.5rem; justify-content: space-evenly; min-height: 0; min-width: 0; }
+.tv-track-label { font-weight: 700; font-size: 1.05rem; margin-bottom: 0.2rem; }
+.tv-slots { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0.45rem; }
+.tv-slot { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.15rem; min-width: 0; }
+.tv-slot-card { width: 100%; height: 13vh; border-radius: 0.6rem; border: 3px dashed var(--line); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; background: var(--paper); opacity: 0.85; }
+.tv-board.over .tv-slot-card { height: 7vh; font-size: 1.3rem; }
+/* Game over: the cards say it all; drop the captions so the superlatives fit on any TV. */
+.tv-board.over .tv-slot-cap, .tv-board.over .tv-slot-power { display: none; }
+.tv-board.over .tv-tracks { justify-content: flex-start; gap: 0.6rem; }
 .tv-track-B .tv-slot.filled .tv-slot-card { background: var(--sage); border: 3px solid var(--sage); opacity: 1; }
 .tv-track-O .tv-slot.filled .tv-slot-card { background: var(--coral); border: 3px solid var(--coral); opacity: 1; }
 .tv-slot.fresh .tv-slot-card { animation: slot-in 0.9s cubic-bezier(.2, 1.4, .4, 1); }
-.tv-slot-cap { font-size: 0.95rem; line-height: 1.15; color: var(--muted); }
+.tv-slot-cap { font-size: 0.78rem; line-height: 1.15; min-height: 3.45em; color: var(--muted); overflow-wrap: anywhere; }
 .tv-slot.filled .tv-slot-cap { color: var(--ink); font-weight: 600; }
-.tv-slot-power { font-size: 0.9rem; font-weight: 700; color: var(--wine); }
-.tv-meta { display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; font-weight: 600; }
-.tv-meter { display: flex; align-items: center; gap: 0.5rem; }
-.tv-meter-dot { width: 2rem; height: 2rem; border-radius: 50%; border: 3px solid var(--gold); display: inline-flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: transform 0.3s; }
+.tv-slot-power { font-size: 0.75rem; line-height: 1.15; font-weight: 700; color: var(--wine); }
+.tv-meta { display: flex; justify-content: space-between; align-items: center; gap: 1rem; font-size: 1rem; font-weight: 600; }
+.tv-meter { display: flex; align-items: center; gap: 0.45rem; }
+.tv-meter-dot { width: 1.8rem; height: 1.8rem; border-radius: 50%; border: 3px solid var(--gold); display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: transform 0.3s; }
 .tv-meter-dot.on { background: var(--gold); transform: scale(1.15); }
-.tv-piles { display: flex; gap: 1.2rem; color: var(--muted); }
+.tv-piles { display: flex; gap: 1rem; color: var(--muted); }
 
-.tv-table { position: relative; min-height: 0; }
-.tv-oval { position: absolute; inset: 12% 14%; border-radius: 50%; background: radial-gradient(ellipse at center, #8a3557 0%, var(--wine) 70%); box-shadow: inset 0 0 0 0.6rem #5a1830, 0 0.6rem 1.5rem rgba(42, 30, 36, 0.25); }
+/* The table: seats are centred on points inside .tv-seats, whose inset leaves room for half a seat. */
+.tv-table { position: relative; min-height: 0; min-width: 0; }
+.tv-oval { position: absolute; inset: 15% 13%; border-radius: 50%; background: radial-gradient(ellipse at center, #8a3557 0%, var(--wine) 70%); box-shadow: inset 0 0 0 0.6rem #5a1830, 0 0.6rem 1.5rem rgba(42, 30, 36, 0.25); }
+.tv-seats { position: absolute; inset: 2.4rem 4.2rem; }
 .tv-arrow { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.tv-arrow line { stroke: var(--gold); stroke-linecap: round; stroke-dasharray: 14 10; vector-effect: non-scaling-stroke; animation: dash 1s linear infinite; }
-.tv-arrow line { stroke-width: 6; }
-.tv-seat { position: absolute; transform: translate(-50%, -50%); background: var(--paper); border: 3px solid var(--line); border-radius: 1rem; padding: 0.3rem 0.9rem; text-align: center; min-width: 7rem; box-shadow: 0 0.2rem 0.6rem rgba(42, 30, 36, 0.15); transition: opacity 0.4s; }
+.tv-arrow line { stroke: var(--gold); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 14 10; vector-effect: non-scaling-stroke; animation: dash 1s linear infinite; }
+.tv-seat { position: absolute; transform: translate(-50%, -50%); background: var(--paper); border: 3px solid var(--line); border-radius: 0.9rem; padding: 0.2rem 0.55rem; text-align: center; width: max-content; min-width: 5rem; max-width: 9rem; box-shadow: 0 0.2rem 0.6rem rgba(42, 30, 36, 0.15); transition: opacity 0.4s; }
 .tv-seat.out { opacity: 0.45; filter: grayscale(1); }
-.tv-name { font-weight: 700; font-size: 1.3rem; }
-.tv-badges { font-size: 1.4rem; min-height: 1.6rem; line-height: 1; }
+.tv-name { font-weight: 700; font-size: 0.95rem; line-height: 1.15; overflow-wrap: break-word; }
+.tv-board.over .tv-badges:empty { display: none; }
+.tv-badges { font-size: 1.1rem; min-height: 1.25rem; line-height: 1.1; }
 .tv-seat.flip { animation: flip-in 0.8s ease-out both; }
 .tv-seat.role-chill { border-color: var(--sage); }
 .tv-seat.role-over, .tv-seat.role-chief { border-color: var(--coral); }
-.tv-role { font-size: 0.9rem; font-weight: 700; }
-.tv-veto-note, .tv-shh-note { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: #fff; font-weight: 700; font-size: 1.2rem; }
-.tv-shh-note { font-size: 4rem; animation: pulse 2s ease-in-out infinite; }
-.tv-awards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
-.tv-award { background: var(--paper); border: 2px solid var(--gold); border-radius: 0.8rem; padding: 0.5rem 0.8rem; animation: pop-in 0.5s ease-out both; }
-.tv-award-title { font-size: 1rem; font-weight: 700; }
-.tv-award-name { font-family: var(--display); font-size: 1.6rem; color: var(--wine); }
+.tv-role { font-size: 0.75rem; line-height: 1.15; font-weight: 700; }
+/* Notes in the middle of the table stack instead of overlapping. */
+.tv-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem; pointer-events: none; }
+.tv-veto-note { color: #fff; font-weight: 700; font-size: 1rem; text-align: center; }
+.tv-shh-note { font-size: 3.4rem; line-height: 1.2; animation: pulse 2s ease-in-out infinite; }
+.tv-awards { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.tv-award { background: var(--paper); border: 2px solid var(--gold); border-radius: 0.8rem; padding: 0.35rem 0.7rem; animation: pop-in 0.5s ease-out both; min-width: 0; }
+.tv-award-title { font-size: 0.85rem; font-weight: 700; line-height: 1.2; }
+.tv-award-name { font-family: var(--display); font-size: 1.25rem; line-height: 1.2; color: var(--wine); overflow-wrap: anywhere; }
 
 /* ----- beats */
 .tv-beat { position: absolute; inset: 0; z-index: 40; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: rgba(248, 241, 231, 0.9); animation: beat-in 0.35s ease-out; pointer-events: none; padding: 2rem; }
-.tv-beat-big { font-size: 8rem; line-height: 1.1; animation: pop-in 0.6s cubic-bezier(.2, 1.5, .4, 1); }
-.tv-beat-title { font-family: var(--display); font-size: 4rem; font-weight: 700; color: var(--wine); max-width: 85%; }
+.tv-beat-big { font-size: 6rem; line-height: 1.3; margin-bottom: 0.8rem; animation: pop-in 0.6s cubic-bezier(.2, 1.5, .4, 1); }
+.tv-beat-title { font-family: var(--display); font-size: 3.4rem; line-height: 1.15; font-weight: 700; color: var(--wine); max-width: 85%; }
 .tv-beat-sub { font-size: 2rem; font-weight: 600; margin-top: 0.4rem; }
 .tv-beat-cardname { font-size: 1.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
 .beat-sunrise { background: linear-gradient(to top, #f6c66b 0%, #f8e3bd 45%, rgba(248, 241, 231, 0.95) 100%); }
@@ -357,14 +380,14 @@ html.tv-mode body { font-size: clamp(16px, 1.6vw, 30px); overflow: hidden; }
 .beat-win-chill .tv-beat-big { animation: toast 1.2s ease-in-out 2; }
 .beat-reveal-chief .tv-beat-big { animation: flip-y 1s ease-out; }
 .tv-vote-grid { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; max-width: 90%; perspective: 1000px; }
-.tv-flip { width: 9rem; height: 6.5rem; }
+.tv-flip { width: 8.5rem; height: 6.2rem; }
 .tv-flip-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; animation: flip-card 0.7s ease-out 0.6s both; }
-.tv-flip-front, .tv-flip-back { position: absolute; inset: 0; border-radius: 0.8rem; display: flex; flex-direction: column; align-items: center; justify-content: center; backface-visibility: hidden; font-size: 1.2rem; font-weight: 700; }
+.tv-flip-front, .tv-flip-back { position: absolute; inset: 0; border-radius: 0.8rem; display: flex; flex-direction: column; align-items: center; justify-content: center; backface-visibility: hidden; font-size: 1rem; line-height: 1.15; font-weight: 700; padding: 0.3rem; text-align: center; overflow-wrap: anywhere; }
 .tv-flip-front { background: var(--wine); color: #fff; }
 .tv-flip-back { transform: rotateY(180deg); background: #fff; border: 4px solid var(--line); }
 .tv-flip-inner.yes .tv-flip-back { border-color: var(--sage); color: #2d6a5b; }
 .tv-flip-inner.no .tv-flip-back { border-color: var(--coral); color: #a8401f; }
-.tv-flip-back strong { font-size: 1.5rem; }
+.tv-flip-back strong { font-size: 1.3rem; }
 .vote-result { margin-top: 1.5rem; animation: pop-in 0.5s ease-out 1.4s both; }
 .vote-result.fail { color: #a8401f; }
 .vote-result.pass { color: #2d6a5b; }
@@ -375,9 +398,9 @@ html.tv-mode body { font-size: clamp(16px, 1.6vw, 30px); overflow: hidden; }
 @keyframes pop-in { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
 @keyframes beat-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slot-in { from { transform: translateY(-60%) rotate(-12deg) scale(1.3); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes card-slide { from { transform: translateX(-60vw) rotate(-20deg); } to { transform: none; } }
-@keyframes sunrise { from { transform: translateY(40vh); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes wobble { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
+@keyframes card-slide { from { transform: translateX(-40vw) rotate(-20deg); opacity: 0; } 40% { opacity: 1; } to { transform: none; } }
+@keyframes sunrise { from { transform: translateY(12%) scale(0.85); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes wobble { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
 @keyframes buzz { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
 @keyframes rock { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
 @keyframes flip-y { from { transform: rotateY(0); } to { transform: rotateY(360deg); } }

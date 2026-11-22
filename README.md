@@ -55,6 +55,7 @@ TEST_DATABASE_URL=postgresql://... python -m pytest -q tests/test_postgres.py
 E2E_DATABASE_URL=postgresql://... python -m pytest -q tests/test_e2e.py           # e2e on Postgres
 (cd web && npm test)                      # discreet-mode rendering tests
 python scripts/sample_game.py 8 3         # print a sample game transcript in theme words
+node scripts/visual_audit.mjs http://localhost:8000 ./audit-out 10  # layout audit, needs Playwright
 ```
 
 CI (GitHub Actions) runs all of the above on every push, with a Postgres service, plus a Docker build.

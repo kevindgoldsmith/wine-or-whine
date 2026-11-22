@@ -71,7 +71,10 @@ export function PhoneApp(props: { code: string }) {
   const myTurn = !!g && mySeat !== null && g.waiting_on.includes(mySeat) && g.phase !== 'reveal'
   const turnKey = g ? `${g.day}-${g.phase}-${myTurn}` : ''
   useEffect(() => {
-    if (myTurn) buzz()
+    if (!myTurn) return
+    buzz()
+    // Bring the prompt's first line ("what do I do now?") into view, under the header.
+    window.scrollTo({ top: 0 })
   }, [turnKey])
 
   useEffect(() => {

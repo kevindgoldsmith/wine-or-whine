@@ -94,3 +94,22 @@ Judgement calls made while building, newest at the bottom of each section.
   - If the TV's browser loses its stored key, nobody can take hosting from a phone host, but the room keeps
     working; if the TV itself was host at that point, the game can't be started or paused until a new room is
     made. Acceptable for a party game; noted here in case it bites.
+
+## Visual audit (2026-11-22)
+`scripts/visual_audit.mjs` plays real games in Chromium with phones (320–768 px, plus landscape) and TVs
+(960×540 to 1920×1080) all live at once, and on every new screen state checks for overlapping text,
+colliding seats/cards, clipped or off-screen text, sideways scroll and small tap targets. Final runs
+(10 players with long names, 7 and 5 players): 801 states, 0 issues. Fixes it drove:
+- **TV scaling bug:** the scale factor was set on `<body>`, but `rem` follows `<html>`, so every TV rendered at a
+  fixed 16 px base. Now `html.tv-mode` scales with min(width, height): each 16:9 screen shows the same layout
+  (1280×720 → 16 px, 1920×1080 → 24 px).
+- **TV fits one screen:** track cards sized in vh, captions reserved at 3 lines; at game over the captions are
+  hidden (the coloured cards say it all) so the superlatives fit; "Start a new trip" moved into the header.
+- **Seats:** placed at equal *arc length* around a rounded table using its measured on-screen shape (equal
+  angles bunched them at the top and bottom); seats size to their content so names never break mid-word.
+- **Pause bug:** the TV's pause screen covered the 👑 Host button, so a TV host couldn't resume. Fixed.
+- **Superlatives:** a 4+-way tie is no award and is dropped.
+- **Phone header:** two fixed rows that never wrap (was up to four on 320 px); not pinned on short landscape
+  screens; the page scrolls to the top when it becomes your turn so the prompt's first line is visible.
+- **Beats:** big icons get their own space (the sunrise ☀️ used to rise through the title); table notes
+  (🤫, veto unlocked) stack instead of overlapping.

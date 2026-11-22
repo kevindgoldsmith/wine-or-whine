@@ -566,7 +566,10 @@ def superlatives(s: GameState) -> list[dict]:
         if not pool:
             return None
         top = max(scores[p] for p in pool)
-        return {"key": key, "seats": [p for p in pool if scores[p] == top], "count": top}
+        seats = [p for p in pool if scores[p] == top]
+        if len(seats) > 3:  # a 4+-way tie isn't an award (and doesn't fit on a TV card)
+            return None
+        return {"key": key, "seats": seats, "count": top}
 
     awards = [
         best("one_more_stop", over_gov, lambda p: True),
