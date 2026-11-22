@@ -98,6 +98,20 @@ describe('discreet mode', () => {
     expect(inv).toContain('Priya is on Team Overschedulers')
   })
 
+  it('normal mode lays cards out in equal grid columns; only the veto button gets its own row', () => {
+    for (const hand of [['B', 'O', 'O'], ['O', 'O', 'O'], ['B', 'B', 'O']] as const) {
+      const html = wrap(<HandPrompt hand={[...hand]} mode="discard" send={noop} />, false)
+      expect(html).toContain('--cols:3')
+      expect(html).toContain('layout-cards')
+    }
+    const veto = wrap(<HandPrompt hand={['B', 'O']} mode="enact" vetoAvailable send={noop} />, false)
+    expect(veto).toContain('--cols:2')
+    const wide = choiceButtons(veto).filter((b) => b.cls.split(' ').includes('wide'))
+    expect(wide.map((b) => b.text)).toEqual([expect.stringContaining('veto')])
+    // Discreet mode never uses the wide class (all buttons identical).
+    expect(choiceButtons(wrap(<HandPrompt hand={['B', 'O']} mode="enact" vetoAvailable send={noop} />)).every((b) => b.cls === 'choice')).toBe(true)
+  })
+
   it('normal mode keeps colours and icons (sanity check of the test itself)', () => {
     const html = wrap(<HandPrompt hand={['B', 'O', 'O']} mode="discard" send={noop} />, false)
     expect(html).toMatch(/tone-breezy/)

@@ -51,6 +51,8 @@ export interface Option {
   tone?: 'yes' | 'no' | 'breezy' | 'over' | 'neutral' | 'danger'
   sub?: string
   disabled?: boolean
+  /** Not one of the equal-size cards (e.g. the veto button): takes its own full-width row. */
+  wide?: boolean
 }
 
 /**
@@ -74,11 +76,11 @@ export function ChoiceList(props: {
   const chosen = props.options.find((o) => o.key === sel)
   return (
     <div class={`choices layout-${layout}`}>
-      <div class="choice-list">
+      <div class="choice-list" style={{ '--cols': String(Math.max(1, props.options.filter((o) => !o.wide).length)) } as any}>
         {order.map((o) => {
           const cls = discreet
             ? `choice${o.disabled ? ' disabled' : ''}${sel === o.key ? ' selected' : ''}`
-            : `choice tone-${o.tone ?? 'neutral'}${o.disabled ? ' disabled' : ''}${sel === o.key ? ' selected' : ''}`
+            : `choice tone-${o.tone ?? 'neutral'}${o.wide ? ' wide' : ''}${o.disabled ? ' disabled' : ''}${sel === o.key ? ' selected' : ''}`
           return (
             <button
               type="button"

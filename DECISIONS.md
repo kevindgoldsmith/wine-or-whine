@@ -75,3 +75,8 @@ Judgement calls made while building, newest at the bottom of each section.
   reloads keep it. It's opt-in per URL rather than a build flag because it only affects the visitor's own
   browser: anyone could already join extra seats from another device, so it grants nothing new. The discreet
   preference stays per browser.
+- **Cards render at identical sizes.** The hand is a CSS grid of equal columns (`minmax(0, 1fr)`) and equal
+  rows (`grid-auto-rows: 1fr`). Long words hyphenate inside a card instead of widening it, so a card's size
+  can't hint at which card it is. The veto button isn't a card and gets its own full-width row. Discreet lists
+  use the same equal-row grid. Checked in Chromium at 320/390/430 px, including with deliberately mismatched
+  labels.

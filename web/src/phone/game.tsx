@@ -136,7 +136,7 @@ export function HandPrompt(props: { hand: Card[]; mode: 'discard' | 'enact'; vet
     icon: c === 'B' ? icon('breezy') : icon('over'),
     tone: c === 'B' ? 'breezy' : 'over',
   }))
-  if (props.vetoAvailable) options.push({ key: 'veto', label: ui('veto_button'), icon: '✋', tone: 'neutral' })
+  if (props.vetoAvailable) options.push({ key: 'veto', label: ui('veto_button'), icon: '✋', tone: 'neutral', wide: true })
   return (
     <ChoiceList
       layout="cards"
