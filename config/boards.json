@@ -1,0 +1,8 @@
+{
+  "powers": ["investigate", "special_election", "peek", "execute"],
+  "official": {
+    "5-6": [null, null, "peek", "execute", "execute"],
+    "7-8": [null, "investigate", "special_election", "execute", "execute"],
+    "9-10": ["investigate", "investigate", "special_election", "execute", "execute"]
+  }
+}

@@ -11,7 +11,7 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: python -m pytest -q
         env:
-          SIM_GAMES: "1000"
+          SIM_GAMES: "2000"
   web:
     runs-on: ubuntu-latest
     defaults:
