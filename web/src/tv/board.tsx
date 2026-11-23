@@ -246,7 +246,6 @@ function Rail(props: { kind: 'B' | 'O'; filled: number; board?: (string | null)[
           const last = i === caps.length - 1
           return (
             <div class={`tv-ticket ${filled ? 'filled' : ''} ${fresh === i + 1 ? 'fresh' : ''}`}>
-              {filled ? <span class="tv-ticket-cap">{c}</span> : null}
               {filled ? (
                 <span class={`stamp stamp-${props.kind}`} style={{ transform: `rotate(${[-8, 5, -4, 7, -6, 4][i]}deg)` }}>
                   {ui(props.kind === 'B' ? 'stamp_breezy' : 'stamp_over')}

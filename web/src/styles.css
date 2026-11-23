@@ -935,3 +935,4 @@ html.discreet .slip-stakes { color: #a9a9b0; animation: none; }
 .toggle-hint { font-size: 0.8rem; line-height: 1.3; color: var(--muted); }
 .toggle input { flex: none; }
 .tv-test-stamp { margin-top: 0.5rem; font-size: 0.75rem; white-space: normal; text-align: center; transform: rotate(-2deg); }
+.tv-ticket.filled > .stamp { margin-block: auto; align-self: center; }

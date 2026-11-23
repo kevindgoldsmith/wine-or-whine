@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { StateMsg } from '../types'
 import { DEFAULT_THEME, errorText, loadTheme, onTheme, theme, ui } from '../theme'
-import { Connection, type ConnStatus, isTestTab, markTestTab, seatStore, store, tokenKey } from '../net'
+import { Connection, type ConnStatus, isTestTab, markTestTab, seatStore, tokenKey } from '../net'
 import { buzz, GameCtx, Modal } from './common'
 import { Icon } from '../icons'
 import { type CardMoment, CardSlip } from '../cardslip'
 import { JoinScreen, Lobby, RejoinScreen } from './lobby'
 import { CatchUp, GameOver, Header, OutScreen, RoleReveal, TurnArea } from './game'
 
-const DISCREET_KEY = 'wow:discreet'
+const discreetKey = (code: string) => `wow:${code}:discreet`
 
 export function PhoneApp(props: { code: string }) {
   const [msg, setMsg] = useState<StateMsg | null>(null)
@@ -19,7 +19,7 @@ export function PhoneApp(props: { code: string }) {
   const [rejoinMode, setRejoinMode] = useState(false)
   const [catchUp, setCatchUp] = useState(false)
   const [menu, setMenu] = useState(false)
-  const [discreet, setDiscreetState] = useState(store.get(DISCREET_KEY) === '1')
+  const [discreet, setDiscreetState] = useState(seatStore.get(discreetKey(props.code)) === '1')
   const [, force] = useState(0)
   const errTimer = useRef<number>()
   const [moment, setMoment] = useState<CardMoment | null>(null)
@@ -72,7 +72,7 @@ export function PhoneApp(props: { code: string }) {
   }, [msg?.room.theme])
 
   const setDiscreet = (v: boolean) => {
-    store.set(DISCREET_KEY, v ? '1' : '0')
+    seatStore.set(discreetKey(props.code), v ? '1' : '0')
     setDiscreetState(v)
   }
 

@@ -168,3 +168,10 @@ The first look read as generic. Of three proposed directions (mockups in a priva
   distinct link, so Safari opens a new tab. A tab that arrives with a scan id it hasn't seen also starts as a
   new player, which covers browsers that reuse the tab anyway. The id is removed from the address bar, so a
   reload keeps the seat. The TV shows "Test mode · each scan is a new player" under the code.
+
+## Discreet default and TV ticket notes (2026-11-23)
+- Discreet mode was remembered per browser, so after one player in a browser turned it on, every later player
+  there (and every test tab) started discreet. It's now remembered per player per room (per tab in test mode),
+  so everyone starts in normal mode.
+- Kevin: no notes on the played cards in the TV's ticket rail. Played tickets show only the stamp, centred;
+  the card's one-liner is shown in the card moment instead. Empty tickets still show their power.
