@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks'
 import type { Power, RoomView } from '../types'
-import { errorText, icon, term, ui } from '../theme'
+import { errorText, term, ui } from '../theme'
 import type { Connection } from '../net'
 import { seatStore, hostKeyKey } from '../net'
 import { Credit } from './common'
@@ -83,6 +83,7 @@ export function Lobby(props: {
   const [themes, setThemes] = useState<{ id: string; name: string }[]>([])
   const [boards, setBoards] = useState<Record<string, (Power | null)[]> | null>(null)
   const [advanced, setAdvanced] = useState(false)
+  const [reorder, setReorder] = useState(false)
   useEffect(() => {
     if (!isHost) return
     fetch('/api/themes').then((r) => r.json()).then(setThemes).catch(() => {})
@@ -111,8 +112,8 @@ export function Lobby(props: {
         </header>
       )}
       <p class="status-line">
-        {n < 5 || n > 10
-          ? ui('lobby_need_players', { n })
+        {n < 5
+          ? ui('lobby_count_need', { n: 5 - n })
           : isHost
             ? ui('lobby_seat_hint')
             : room.host_id === 'tv'
@@ -134,7 +135,7 @@ export function Lobby(props: {
               {p.id === props.meId ? <em> ({ui('lobby_you')})</em> : null}
               {p.id === room.host_id ? <span class="badge">{ui('lobby_host_badge')}</span> : null}
             </span>
-            {isHost ? (
+            {isHost && reorder ? (
               <span class="seat-tools">
                 <button type="button" class="icon-btn" aria-label={ui('lobby_up')} disabled={i === 0} onClick={() => move(i, -1)}>▲</button>
                 <button type="button" class="icon-btn" aria-label={ui('lobby_down')} disabled={i === n - 1} onClick={() => move(i, 1)}>▼</button>
@@ -146,6 +147,9 @@ export function Lobby(props: {
           </li>
         ))}
       </ol>
+      {isHost && n > 1 ? (
+        <button type="button" class="link" onClick={() => setReorder(!reorder)}>{reorder ? ui('lobby_reorder_done') : ui('lobby_reorder')}</button>
+      ) : null}
       {props.error ? <p class="error">{errorText(props.error)}</p> : null}
       {isHost ? (
         <section class="host-panel">
@@ -182,7 +186,7 @@ export function Lobby(props: {
                       <label class="field">
                         {ui('lobby_house_slot', { n: i + 1 })}
                         <select value={v ?? ''} onChange={(e) => setSlot(bracket, i, ((e.target as HTMLSelectElement).value || null) as Power | null)}>
-                          {POWERS.map((p) => <option value={p ?? ''}>{p ? `${icon(p)} ${term(p)}` : ui('lobby_house_none')}</option>)}
+                          {POWERS.map((p) => <option value={p ?? ''}>{p ? term(p) : ui('lobby_house_none')}</option>)}
                         </select>
                       </label>
                     ))}

@@ -111,6 +111,12 @@ mid-game and checks every client is back within 10 s (locally it takes under a s
   provider and cached in Postgres by text hash. With `TTS_PROVIDER=none` the TV uses the browser's built-in
   speech. The host can switch voice off in the lobby or the ⋯ menu.
 
+## Look and feel
+The "Itinerary" style: trip paperwork on kraft paper (luggage tags, ticket stubs, rubber stamps, a boarding
+pass, a postcard). Scenery is hand-built SVG in `web/src/scenery.tsx`, icons in `web/src/icons.tsx`; fonts are
+self-hosted through @fontsource. Discreet mode drops all of it. Layout is checked with
+`scripts/visual_audit.mjs` (see Tests).
+
 ## Themes
 
 Every player-facing word lives in `themes/wine_or_whine.json`. To add a theme, copy it, change `id`, `name`

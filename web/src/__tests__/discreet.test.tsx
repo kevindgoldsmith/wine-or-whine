@@ -62,7 +62,8 @@ describe('discreet mode', () => {
         expect(b.cls).not.toMatch(/tone-/)
       }
       for (const b of buttons(html)) expect(b.text).not.toMatch(EMOJI)
-      expect(html).not.toMatch(/layout-(pair|cards)/)
+      expect(html).not.toMatch(/layout-(pair|cards|tags)/)
+      expect(html).not.toMatch(/<svg/) // no icons or scenery on private screens in discreet mode
     }
     expect([...allClasses]).toEqual(['choice'])
   })
@@ -90,6 +91,7 @@ describe('discreet mode', () => {
       const html = wrap(<RoleCard g={g} />)
       expect(html).toContain('role-plain')
       expect(html).not.toMatch(EMOJI)
+      expect(html).not.toMatch(/<svg/)
       expect(html).toMatch(/Team: (Chill Parents|Overschedulers)/)
     }
     const peek = wrap(<ResultBody r={{ type: 'peek', day: 1, cards: ['B', 'O', 'O'] }} />)
@@ -115,6 +117,6 @@ describe('discreet mode', () => {
   it('normal mode keeps colours and icons (sanity check of the test itself)', () => {
     const html = wrap(<HandPrompt hand={['B', 'O', 'O']} mode="discard" send={noop} />, false)
     expect(html).toMatch(/tone-breezy/)
-    expect(html).toMatch(EMOJI)
+    expect(html).toMatch(/<svg/) // drawn icons and the vineyard stub
   })
 })

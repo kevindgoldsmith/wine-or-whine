@@ -113,3 +113,25 @@ colliding seats/cards, clipped or off-screen text, sideways scroll and small tap
   screens; the page scrolls to the top when it becomes your turn so the prompt's first line is visible.
 - **Beats:** big icons get their own space (the sunrise ☀️ used to rise through the title); table notes
   (🤫, veto unlocked) stack instead of overlapping.
+
+## "Itinerary" redesign (2026-11-23)
+The first look read as generic. Of three proposed directions (mockups in a private canvas), Kevin picked
+**Itinerary**: a group trip's paperwork on a kraft-paper table, with added wine-country scenery.
+- **Look:** kraft background, paper sheets, ink navy, rubber-stamp red, vine green, masking-tape yellow. Type:
+  DM Serif Display (headings), IBM Plex Mono (labels, logs), IBM Plex Sans (body), Caveat (handwriting).
+  Self-hosted via @fontsource, so no font CDN.
+- **Props, not panels:** players are luggage tags on a vine; cards are ticket stubs; votes are rubber stamps; the
+  government is a boarding pass; the TV has an itinerary sheet (the log, one line per day), a "Greetings from
+  Napa Valley" postcard and the ticket rail.
+- **Scenery:** drawn as flat SVG in a vintage travel-print style (`web/src/scenery.tsx`) instead of AI or stock
+  images. It's crisp on a 4K TV, tiny, has no licence questions, and can be toned down behind text.
+- **Icons:** emoji in the interface were replaced by drawn line icons (`web/src/icons.tsx`) for a consistent look.
+  Theme strings for logs/beats lost their emoji too; the theme's `icons` map still names a concept per key.
+- **Discreet mode stays plain:** no icons, scenery, colours or art; same-size grey buttons in shuffled order,
+  and the confirm button says "Pick one first" (not a choice-specific word) until something is picked.
+- **Game over on the phone** says "You won!" / "You lost" with your team's name, and puts your own tag first.
+- **Adversarial review:** a separate reviewer agent critiqued screenshots from the audit over five rounds
+  (rough → 7 → 8 → 8.5/10, final verdict "ship"); every issue it raised was fixed or deliberately declined.
+- **Audit additions:** a *fit* check (on a 320×568 phone the confirm and any short option list fit above the
+  bottom bar, no option is half-hidden unless a long list shows a "↓ N more" hint), a mid-word split check
+  and a coverage check. Long name lists scroll under a sticky confirm with that hint.

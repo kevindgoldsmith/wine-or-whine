@@ -3,6 +3,7 @@ import type { StateMsg } from '../types'
 import { DEFAULT_THEME, errorText, loadTheme, onTheme, theme, ui } from '../theme'
 import { Connection, type ConnStatus, isTestTab, seatStore, store, tokenKey } from '../net'
 import { buzz, GameCtx, Modal } from './common'
+import { Icon } from '../icons'
 import { JoinScreen, Lobby, RejoinScreen } from './lobby'
 import { CatchUp, GameOver, Header, OutScreen, RoleReveal, TurnArea } from './game'
 
@@ -99,8 +100,9 @@ export function PhoneApp(props: { code: string }) {
   )
   const ctx = { discreet, hints: room.hints, names, me: mySeat }
   const discreetToggle = (
-    <button type="button" class={`small toggle-btn ${discreet ? 'on' : ''}`} aria-pressed={discreet} onClick={() => setDiscreet(!discreet)}>
-      {ui('header_discreet')} {discreet ? '●' : '○'}
+    <button type="button" class="small toggle-btn" aria-pressed={discreet} onClick={() => setDiscreet(!discreet)}>
+      <span class="btn-main">{ui('header_discreet')}</span>
+      <span class="btn-state">{discreet ? ui('toggle_on') : ui('toggle_off')}</span>
     </button>
   )
 
@@ -118,7 +120,7 @@ export function PhoneApp(props: { code: string }) {
 
   const isHost = me.host
   const hostMenu = isHost ? (
-    <button type="button" class="small" aria-label="Host" onClick={() => setMenu(true)}>⋯</button>
+    <button type="button" class="small host-btn" onClick={() => setMenu(true)}>{ui('host_tools')}</button>
   ) : null
   const menuModal = menu ? (
     <Modal title={ui('lobby_host_badge')} onClose={() => setMenu(false)}>
@@ -162,7 +164,7 @@ export function PhoneApp(props: { code: string }) {
     content = (
       <main class="screen game">
         <Header g={g} onCatchUp={() => setCatchUp(true)} discreetToggle={discreetToggle} hostMenu={hostMenu} />
-        <PhoneReadBanner g={g} names={names} code={`${room.code}:${room.games_played}`} />
+        {g.waiting_on.includes(g.me ?? -1) && g.phase !== 'reveal' ? null : <PhoneReadBanner g={g} names={names} code={`${room.code}:${room.games_played}`} />}
         {g.spectator ? <OutScreen g={g} /> : <TurnArea g={g} send={(a) => conn.act(a)} />}
         {error ? <p class="error toast">{errorText(error)}</p> : null}
       </main>
@@ -192,7 +194,7 @@ function PhoneReadBanner(props: { g: any; names: string[]; code: string }) {
   if (by.length <= seen) return null
   return (
     <div class="banner" role="status">
-      <span>📱 {ui('result_phone_read', { name: props.names[by[by.length - 1]] })}</span>
+      <span class="banner-text"><Icon name="investigate" /> {ui('result_phone_read', { name: props.names[by[by.length - 1]] })}</span>
       <button type="button" class="ghost" onClick={() => {
         sessionStorage.setItem(key, String(by.length))
         setSeen(by.length)

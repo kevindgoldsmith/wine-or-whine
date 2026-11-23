@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { GameView, RoomView, StateMsg } from '../types'
-import { DEFAULT_THEME, cardName, errorText, icon, loadTheme, onTheme, powerName, roleName, term, theme, ui } from '../theme'
+import { DEFAULT_THEME, errorText, loadTheme, onTheme, theme, ui } from '../theme'
 import { Connection, type ConnStatus } from '../net'
 import { lobbyMusic, playSfx, say, setMuted, unlockAudio } from '../audio'
 import { beatsFor, type Beat } from './beats'
+import { BeatOverlay, Board, Credit, TvLobby } from './board'
+import { NapaScene } from '../scenery'
+import { Icon } from '../icons'
 import { createRoomAndGo } from '../newroom'
 import { Lobby } from '../phone/lobby'
 
@@ -96,9 +99,12 @@ export function TvApp(props: { code: string }) {
         startedRef.current = true
         setStarted(true)
       }}>
-        <h1 class="tv-title">{ui('app_title')}</h1>
-        <button type="button" class="tv-tap">{ui('tv_tap')}</button>
-        <p>{ui('tv_tap_sub')}</p>
+        <div class="tv-start-card">
+          <NapaScene class="tv-start-scene" />
+          <h1 class="tv-title">{ui('app_title')}</h1>
+          <button type="button" class="tv-tap">{ui('tv_tap')}</button>
+          <p class="tv-tap-sub">{ui('tv_tap_sub')}</p>
+        </div>
       </main>
     )
   }
@@ -129,10 +135,10 @@ export function TvApp(props: { code: string }) {
     <main class={`tv-root ${hushed ? 'hushed' : ''}`}>
       {status !== 'open' ? <div class="conn-banner">{ui('reconnecting')}</div> : null}
       <div class="tv-corner">
-        {tvAdmin ? <button type="button" class="tv-mute" onClick={() => setDrawer(true)}>👑 {ui('tv_host_button')}</button> : null}
-        <button type="button" class="tv-mute" onClick={toggleMute}>{muted ? `🔇 ${ui('tv_unmute')}` : `🔊 ${ui('tv_mute')}`}</button>
+        {tvAdmin ? <button type="button" class="tv-mute tv-host-btn" onClick={() => setDrawer(true)}><Icon name="chief" /> {ui('tv_host_button')}</button> : null}
+        <button type="button" class="tv-mute" aria-pressed={muted} onClick={toggleMute}>{muted ? ui('tv_unmute') : ui('tv_mute')}</button>
       </div>
-      {inLobby || !g ? <TvLobby room={room} conn={tvHost ? conn : null} /> : <Board g={g} names={names} beat={current} />}
+      {inLobby || !g ? <TvLobby room={room} conn={tvHost ? conn : null} /> : <Board g={g} names={names} code={room.code} newTrip={<NewTripButton />} />}
       {drawer && tvAdmin ? (
         <HostDrawer room={room} g={g} conn={conn} tvHost={tvHost} error={error} code={code} onCode={setCode}
           onClose={() => {
@@ -142,263 +148,8 @@ export function TvApp(props: { code: string }) {
       ) : null}
       {current ? <BeatOverlay beat={current} names={names} /> : null}
       {room.paused ? <div class="tv-paused"><h2>{ui('paused')}</h2><p>{ui('paused_body')}</p></div> : null}
-      <footer class="tv-credit">{theme()!.credit}</footer>
+      <Credit />
     </main>
-  )
-}
-
-function TvLobby(props: { room: RoomView; conn: Connection | null }) {
-  const r = props.room
-  return (
-    <section class="tv-lobby">
-      <div class="tv-lobby-left">
-        <h1 class="tv-title">{ui('app_title')}</h1>
-        <p class="tv-tagline">{theme()!.tagline}</p>
-        <p class="tv-join">{ui('tv_join_at')}</p>
-        <p class="tv-url">{r.join_url.replace(/^https?:\/\//, '')}</p>
-        <div class="tv-code">{r.code}</div>
-        <p class="tv-sub">{ui('lobby_need_players', { n: r.players.length })}</p>
-        {r.host_id === 'tv' ? <p class="tv-sub">👑 {ui('tv_is_host')}</p> : null}
-        <ul class="tv-names">
-          {r.players.map((p) => <li class={p.online ? '' : 'off'}>{p.id === r.host_id ? '👑 ' : ''}{p.name}</li>)}
-        </ul>
-        {props.conn && r.players.length >= 5 && r.players.length <= 10 ? (
-          <button type="button" class="tv-new tv-start-btn" onClick={() => props.conn!.host({ type: 'start' })}>{ui('lobby_start')}</button>
-        ) : null}
-      </div>
-      <img class="tv-qr" src={`/api/rooms/${r.code}/qr.svg`} alt="" />
-    </section>
-  )
-}
-
-// Seats sit at equal distances along a rounded-rectangle "table" (a superellipse), starting top centre and
-// going clockwise. Equal arc spacing (rather than equal angles) keeps neighbours from bunching up.
-const seatCache = new Map<string, { x: number; y: number }[]>()
-function seatPos(i: number, n: number, aspect = 1.15) {
-  // aspect = width / height of the seats box as measured on screen, so spacing is even in real pixels.
-  const key = `${n}:${aspect.toFixed(2)}`
-  if (!seatCache.has(key)) {
-    const P = 4, ASPECT = aspect // superellipse exponent; measured box shape
-    const pts: { x: number; y: number }[] = []
-    for (let k = 0; k <= 1440; k++) {
-      const t = -Math.PI / 2 + (k / 1440) * 2 * Math.PI
-      const c = Math.cos(t), sn = Math.sin(t)
-      pts.push({ x: Math.sign(c) * Math.abs(c) ** (2 / P), y: Math.sign(sn) * Math.abs(sn) ** (2 / P) })
-    }
-    const cum = [0]
-    for (let k = 1; k < pts.length; k++) cum.push(cum[k - 1] + Math.hypot((pts[k].x - pts[k - 1].x) * ASPECT, pts[k].y - pts[k - 1].y))
-    const total = cum[cum.length - 1]
-    const out: { x: number; y: number }[] = []
-    let k = 0
-    for (let s = 0; s < n; s++) {
-      const target = (s / n) * total
-      while (cum[k] < target) k++
-      out.push({ x: 50 + 50 * pts[k].x, y: 50 + 50 * pts[k].y })
-    }
-    seatCache.set(key, out)
-  }
-  return seatCache.get(key)![i]
-}
-
-function statusText(g: GameView, names: string[]) {
-  const pres = names[g.president]
-  switch (g.phase) {
-    case 'reveal':
-      return ui('tv_check_roles')
-    case 'nominate':
-      return ui('waiting_nominate', { name: pres })
-    case 'vote':
-      return ui('tv_waiting_votes', { n: g.waiting_on.length })
-    case 'pres_discard':
-    case 'chanc_enact':
-      return ui('shh')
-    case 'veto_response':
-      return ui('waiting_veto', { pres, planner: names[g.chancellor!] })
-    case 'power':
-      return ui('waiting_power', { name: pres, power: powerName(g.power!) })
-    case 'power_result':
-      return ui('waiting_result', { name: pres })
-    default:
-      return ''
-  }
-}
-
-function TrackRow(props: { kind: 'B' | 'O'; filled: number; board?: (string | null)[] }) {
-  const th = theme()!
-  const caps = props.kind === 'B' ? th.tracks.breezy : th.tracks.over
-  const prev = useRef(props.filled)
-  const fresh = props.filled > prev.current ? props.filled : 0
-  useEffect(() => {
-    prev.current = props.filled
-  }, [props.filled])
-  return (
-    <div class={`tv-track tv-track-${props.kind}`}>
-      <div class="tv-track-label">
-        <span aria-hidden="true">{props.kind === 'B' ? icon('breezy') : icon('over')}</span>{' '}
-        {props.kind === 'B' ? term('breezy_plural') : term('over_plural')}
-      </div>
-      <div class="tv-slots">
-        {caps.map((c, i) => {
-          const filled = i < props.filled
-          const power = props.board?.[i]
-          return (
-            <div class={`tv-slot ${filled ? 'filled' : ''} ${fresh === i + 1 ? 'fresh' : ''}`}>
-              <div class="tv-slot-card">{filled ? (props.kind === 'B' ? icon('breezy') : icon('over')) : power ? icon(power) : ''}</div>
-              <div class="tv-slot-cap">{c}</div>
-              {!filled && power ? <div class="tv-slot-power">{powerName(power)}</div> : null}
-              {props.kind === 'O' && i === 4 && !filled ? <div class="tv-slot-power">✋ {term('veto')}</div> : null}
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-function Board(props: { g: GameView; names: string[]; beat?: Beat }) {
-  const { g, names } = props
-  const over = g.phase === 'game_over'
-  const n = g.n
-  const nom = g.nominee ?? (['pres_discard', 'chanc_enact', 'veto_response'].includes(g.phase) ? g.chancellor : null)
-  const seatsRef = useRef<HTMLDivElement>(null)
-  const [aspect, setAspect] = useState(1.15)
-  useEffect(() => {
-    const el = seatsRef.current
-    if (!el || typeof ResizeObserver === 'undefined') return
-    const ro = new ResizeObserver(() => {
-      const r = el.getBoundingClientRect()
-      if (r.width > 0 && r.height > 0) setAspect(Math.round((r.width / r.height) * 20) / 20)
-    })
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-  const p1 = seatPos(g.president, n, aspect)
-  const p2 = nom !== null ? seatPos(nom, n, aspect) : null
-  return (
-    <section class={`tv-board ${over ? 'over' : ''}`}>
-      <header class="tv-top">
-        <div class="tv-day">{over ? ui('game_over') : ui('header_day', { n: Math.max(g.day, 1) })}</div>
-        <div class="tv-status">{over ? <><strong>{theme()!.winner_title[g.winner!]}</strong> {theme()!.win[g.win_reason!]}</> : statusText(g, names)}</div>
-        {over ? <div class="tv-newtrip" title={ui('tv_new_trip_sub')}><NewTripButton /></div> : null}
-      </header>
-      <div class="tv-main">
-        <div class="tv-tracks">
-          <TrackRow kind="B" filled={g.breezy} />
-          <TrackRow kind="O" filled={g.over} board={g.board} />
-          <div class="tv-meta">
-            <div class="tv-meter">
-              <span>{term('meter')}</span>
-              {[1, 2, 3].map((i) => <span class={`tv-meter-dot ${i <= g.meter ? 'on' : ''}`}>{i}</span>)}
-            </div>
-            <div class="tv-piles">
-              <span>{ui('tv_deck', { n: g.deck_count })}</span>
-              <span>{ui('tv_discard', { n: g.discard_count })}</span>
-            </div>
-          </div>
-          {over ? <TvAwards g={g} names={names} /> : null}
-        </div>
-        <div class="tv-table">
-          <div class="tv-oval" />
-          <div class="tv-seats" ref={seatsRef}>
-          {p2 && !over ? (
-            <svg class="tv-arrow" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-              <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} />
-            </svg>
-          ) : null}
-          {names.map((name, i) => {
-            const pos = seatPos(i, n, aspect)
-            const role = g.roles?.[i]
-            return (
-              <div class={`tv-seat ${g.alive[i] ? '' : 'out'} ${over && role ? 'flip role-' + role : ''}`} style={{ left: `${pos.x}%`, top: `${pos.y}%` }}>
-                <div class="tv-badges">
-                  {i === g.president && !over ? <span title={term('president')}>{icon('president')}</span> : null}
-                  {(i === g.chancellor || i === g.nominee) && !over ? <span title={term('chancellor')}>{icon('chancellor')}</span> : null}
-                  {g.term_limited.includes(i) && g.phase === 'nominate' ? <span title={term('sleeping_in')}>{icon('sleeping')}</span> : null}
-                  {g.voted.includes(i) ? <span>{icon('voted')}</span> : null}
-                  {g.phase === 'reveal' && g.acked.includes(i) ? <span>{icon('voted')}</span> : null}
-                  {!g.alive[i] ? <span>{icon('execute')}</span> : null}
-                </div>
-                <div class="tv-name">{name}</div>
-                {over && role ? <div class="tv-role">{role === 'chill' ? icon('chill') : role === 'chief' ? icon('chief') : icon('over_team')} {roleName(role)}</div> : null}
-              </div>
-            )
-          })}
-          <div class="tv-center">
-            {['pres_discard', 'chanc_enact', 'veto_response'].includes(g.phase) ? <div class="tv-shh-note">{icon('handoff')}</div> : null}
-            {g.veto_unlocked && !over ? <div class="tv-veto-note">✋ {ui('veto_unlocked')}</div> : null}
-          </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function TvAwards(props: { g: GameView; names: string[] }) {
-  const th = theme()!
-  if (!props.g.superlatives.length) return null
-  return (
-    <div class="tv-awards">
-      {props.g.superlatives.map((a) => (
-        <div class="tv-award">
-          <div class="tv-award-title">🏆 {th.superlatives[a.key]?.title}</div>
-          <div class="tv-award-name">{a.seats.map((s) => props.names[s]).join(', ')}</div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function BeatOverlay(props: { beat: Beat; names: string[] }) {
-  const b = props.beat
-  if (b.kind === 'vote') {
-    const e = b.data
-    return (
-      <div class="tv-beat beat-vote" key={b.id}>
-        <div class="tv-vote-grid">
-          {e.votes.map((v: boolean | null, i: number) =>
-            v === null ? null : (
-              <div class="tv-flip">
-                <div class={`tv-flip-inner ${v ? 'yes' : 'no'}`}>
-                  <div class="tv-flip-front">{props.names[i]}</div>
-                  <div class="tv-flip-back">
-                    <span>{props.names[i]}</span>
-                    <strong>{v ? `👍 ${term('yes')}` : `👎 ${term('no')}`}</strong>
-                  </div>
-                </div>
-              </div>
-            ),
-          )}
-        </div>
-        <div class={`tv-beat-title vote-result ${e.passed ? 'pass' : 'fail'}`}>{b.title}</div>
-      </div>
-    )
-  }
-  const cardClass = b.kind === 'card' || b.kind === 'forced' ? (b.data.card === 'B' ? 'card-B' : 'card-O') : ''
-  return (
-    <div class={`tv-beat beat-${b.kind} ${cardClass}`} key={b.id}>
-      {b.kind === 'win-chill' ? <Confetti /> : null}
-      {b.big ? <div class="tv-beat-big">{b.big}</div> : null}
-      {b.kind === 'card' ? <div class="tv-beat-cardname">{cardName(b.data.card)}</div> : null}
-      <div class="tv-beat-title">{b.title}</div>
-      {b.sub ? <div class="tv-beat-sub">{b.sub}</div> : null}
-    </div>
-  )
-}
-
-function Confetti() {
-  const bits = useMemo(
-    () => Array.from({ length: 60 }, (_, i) => ({
-      left: Math.random() * 100,
-      delay: Math.random() * 1.2,
-      color: ['#E2A73E', '#4F9282', '#6E1F3C', '#F8F1E7', '#E0603C'][i % 5],
-    })),
-    [],
-  )
-  return (
-    <div class="confetti" aria-hidden="true">
-      {bits.map((c) => <i style={{ left: `${c.left}%`, animationDelay: `${c.delay}s`, background: c.color }} />)}
-    </div>
   )
 }
 
@@ -415,7 +166,7 @@ function NewTripButton() {
           setErr(true)
           setBusy(false)
         }
-      }}>📺 {ui('tv_new_trip')}</button>
+      }}>{ui('tv_new_trip')}</button>
       {err ? <p class="error">{ui('err_generic')}</p> : null}
     </>
   )
@@ -444,14 +195,14 @@ function HostDrawer(props: {
   return (
     <aside class="tv-drawer" role="dialog" aria-label={ui('tv_host_button')}>
       <div class="modal-head">
-        <h2>👑 {ui('tv_host_button')}</h2>
+        <h2>{ui('tv_host_button')}</h2>
         <button type="button" class="ghost" onClick={props.onClose}>{ui('close')}</button>
       </div>
       {props.error ? <p class="error">{errorText(props.error)}</p> : null}
       <section>
         <h3>{ui('tv_current_host', { name: hostName })}</h3>
         {!tvHost ? (
-          <button type="button" class="primary big" onClick={() => conn.host({ type: 'make_host', player_id: 'tv' })}>📺 {ui('tv_take_host')}</button>
+          <button type="button" class="primary big" onClick={() => conn.host({ type: 'make_host', player_id: 'tv' })}>{ui('tv_take_host')}</button>
         ) : null}
         <label class="field">
           {ui('tv_make_host')}

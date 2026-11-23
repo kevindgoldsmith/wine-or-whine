@@ -1,5 +1,6 @@
-import { createContext, type ComponentChildren } from 'preact'
-import { useContext, useMemo, useRef, useState } from 'preact/hooks'
+import { createContext, type ComponentChildren, type JSX } from 'preact'
+import { Icon } from '../icons'
+import { useContext, useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { theme, ui } from '../theme'
 import { playSfx } from '../audio'
 
@@ -47,7 +48,12 @@ export function plain(s: string): string {
 export interface Option {
   key: string
   label: string
+  /** A drawn icon name (icons.tsx). Never shown in discreet mode. */
   icon?: string
+  /** Illustration for a ticket's stub (cards layout). Never shown in discreet mode. */
+  art?: JSX.Element
+  /** Small caps line above the label (e.g. "DAY CARD"). */
+  kicker?: string
   tone?: 'yes' | 'no' | 'breezy' | 'over' | 'neutral' | 'danger'
   sub?: string
   disabled?: boolean
@@ -63,7 +69,9 @@ export function ChoiceList(props: {
   options: Option[]
   onConfirm: (key: string) => void
   confirmLabel?: string
-  layout?: 'stack' | 'pair' | 'cards'
+  /** Label while nothing is picked yet (defaults to the theme's "pick one first"). */
+  pickLabel?: string
+  layout?: 'stack' | 'pair' | 'cards' | 'tags'
   discreetOverride?: boolean
 }) {
   const ctx = useGame()
@@ -74,9 +82,29 @@ export function ChoiceList(props: {
   const order = useMemo(() => (discreet ? shuffled(props.options) : props.options), [discreet, props.options.map((o) => o.key).join()])
   const layout = discreet ? 'stack' : props.layout ?? 'stack'
   const chosen = props.options.find((o) => o.key === sel)
+  // Safety net for lists that still overflow (tiny or landscape screens): say how many options are below.
+  const listRef = useRef<HTMLDivElement>(null)
+  const confirmRef = useRef<HTMLDivElement>(null)
+  const [more, setMore] = useState(0)
+  useEffect(() => {
+    const measure = () => {
+      const list = listRef.current
+      const conf = confirmRef.current
+      if (!list || !conf) return
+      const limit = conf.getBoundingClientRect().top
+      setMore([...list.children].filter((c) => c.getBoundingClientRect().bottom > limit + 1).length)
+    }
+    measure()
+    window.addEventListener('scroll', measure, { passive: true })
+    window.addEventListener('resize', measure)
+    return () => {
+      window.removeEventListener('scroll', measure)
+      window.removeEventListener('resize', measure)
+    }
+  }, [props.options.length])
   return (
     <div class={`choices layout-${layout}`}>
-      <div class="choice-list" style={{ '--cols': String(Math.max(1, props.options.filter((o) => !o.wide).length)) } as any}>
+      <div ref={listRef} class={`choice-list ${sel && !discreet ? 'has-sel' : ''} ${props.options.length > 4 ? 'many' : ''}`} style={{ '--cols': String(Math.max(1, props.options.filter((o) => !o.wide).length)) } as any}>
         {order.map((o) => {
           const cls = discreet
             ? `choice${o.disabled ? ' disabled' : ''}${sel === o.key ? ' selected' : ''}`
@@ -92,14 +120,19 @@ export function ChoiceList(props: {
                 setSel(o.key)
               }}
             >
-              {!discreet && o.icon ? <span class="choice-icon" aria-hidden="true">{o.icon}</span> : null}
-              <span class="choice-label">{discreet ? plain(o.label) : o.label}</span>
-              {o.sub ? <span class="choice-sub">{discreet ? plain(o.sub) : o.sub}</span> : null}
+              {!discreet && o.icon ? <span class="choice-icon"><Icon name={o.icon} /></span> : null}
+              <span class="choice-text">
+                {!discreet && o.kicker ? <span class="choice-kicker">{o.kicker}</span> : null}
+                <span class="choice-label">{discreet ? plain(o.label) : o.label}</span>
+                {o.sub ? <span class="choice-sub">{discreet ? plain(o.sub) : o.sub}</span> : null}
+              </span>
+              {!discreet && o.art ? <span class="choice-art">{o.art}</span> : null}
             </button>
           )
         })}
       </div>
-      <div class="confirm-row">
+      <div class="confirm-row" ref={confirmRef}>
+        {more ? <span class="more-below" aria-live="polite">{ui('more_below', { n: more })}</span> : null}
         <button
           type="button"
           class={discreet ? 'confirm' : 'confirm primary'}
@@ -111,8 +144,8 @@ export function ChoiceList(props: {
             props.onConfirm(chosen.key)
           }}
         >
-          {props.confirmLabel ?? ui('confirm')}
-          {!discreet && chosen ? `: ${chosen.label}` : ''}
+          {!chosen ? (discreet ? ui('pick_first') : props.pickLabel ?? ui('pick_first')) : props.confirmLabel ?? ui('confirm')}
+          {!discreet && chosen ? <span class="confirm-choice">: {chosen.label}</span> : null}
         </button>
       </div>
     </div>
@@ -171,7 +204,7 @@ export function Modal(props: { title: string; onClose: () => void; children: Com
 export function Hint(props: { k: string; text: string }) {
   const { hints } = useGame()
   if (!hints || !props.text) return null
-  return <p class="hint">💡 {props.text}</p>
+  return <p class="hint">{props.text}</p>
 }
 
 export function Credit() {

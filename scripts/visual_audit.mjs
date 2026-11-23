@@ -21,7 +21,7 @@ const pick = (n) => Math.floor(rand() * n)
 
 const PHONES = [
   { name: 'p320', width: 320, height: 568 },
-  { name: 'p360', width: 360, height: 740 },
+  { name: 'p360', width: 360, height: 640 },
   { name: 'p375', width: 375, height: 667 },
   { name: 'p390', width: 390, height: 844 },
   { name: 'p430', width: 430, height: 932 },
@@ -40,7 +40,7 @@ const SHORT_NAMES = ['Sam', 'Jo', 'Ana', 'Tom', 'Bea', 'Kit', 'Dev', 'Lu', 'Max'
 
 // ------------------------------------------------------------------ in-page detector
 function detect() {
-  const OVER = '.tv-beat, .modal-backdrop, .tv-drawer, .paused-overlay, .tv-paused, .conn-banner, .toast, .test-badge, .hold.shown, .confetti, .tv-corner, .lobby-menu, .game-header'
+  const OVER = '.tv-beat, .modal-backdrop, .tv-drawer, .paused-overlay, .tv-paused, .conn-banner, .toast, .test-badge, .hold.shown, .confetti, .tv-corner, .lobby-menu, .game-header, .confirm-row'
   const tv = document.documentElement.classList.contains('tv-mode')
   const visible = (e) => {
     for (let x = e; x && x !== document.documentElement; x = x.parentElement) {
@@ -49,15 +49,35 @@ function detect() {
     }
     return true
   }
+  const rotCache = new Map()
+  const rotatedAncestor = (el) => {
+    if (rotCache.has(el)) return rotCache.get(el)
+    let found = null
+    for (let x = el; x && x !== document.body; x = x.parentElement) {
+      const t = getComputedStyle(x).transform
+      if (t && t !== 'none' && !/^matrix\(1, 0, 0, 1,/.test(t)) { found = x; break }
+    }
+    rotCache.set(el, found)
+    return found
+  }
   const items = []
+  const splitWords = []
   const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
   while (w.nextNode()) {
     const n = w.currentNode
     const t = n.textContent.trim()
     if (!t) continue
     const el = n.parentElement
-    if (!el || !visible(el) || el.closest('select, option, script, style, .tv-flip-front')) continue // flip fronts are face-down (backface hidden)
+    if (!el || !visible(el) || el.closest('select, option, script, style, .tv-flip-front, .tv-vote-q')) continue // flip fronts are face-down (backface hidden)
     const range = document.createRange()
+    const words = /[^\s\u2014\u2013\-/·]{3,}/g
+    let m
+    while ((m = words.exec(n.textContent))) {
+      range.setStart(n, m.index)
+      range.setEnd(n, m.index + m[0].length)
+      const rs = [...range.getClientRects()].filter((r) => r.width > 0.5)
+      if (rs.length > 1 && Math.abs(rs[0].top - rs[rs.length - 1].top) > 2) splitWords.push(`word split: "${m[0]}" (${el.className || el.tagName})`)
+    }
     range.selectNodeContents(n)
     for (const r of range.getClientRects()) {
       if (r.width < 1 || r.height < 1) continue
@@ -71,6 +91,8 @@ function detect() {
     for (let j = i + 1; j < items.length; j++) {
       const a = items[i], b = items[j]
       if (a.el === b.el || a.layer !== b.layer) continue
+      // Text inside a shared rotated container (a tilted paper sheet) has slanted line boxes that graze.
+      if (rotatedAncestor(a.el) && rotatedAncestor(a.el) === rotatedAncestor(b.el)) continue
       const ow = Math.min(a.r.right, b.r.right) - Math.max(a.r.left, b.r.left)
       const oh = Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top)
       if (ow > 3 && oh > 3) out.push(`overlap: "${a.t}" (${desc(a.el)}) × "${b.t}" (${desc(b.el)})`)
@@ -93,7 +115,7 @@ function detect() {
     if (tv && !it.el.closest('.tv-drawer, .tv-beat') && (it.r.bottom > innerHeight + 2 || it.r.top < -2)) out.push(`offscreen-y: "${it.t}" (${desc(it.el)})`)
   }
   // 1b) boxes that must never touch each other (seats around the TV table, track cards)
-  for (const sel of ['.tv-seat', '.tv-slot', '.tv-award', '.choice']) {
+  for (const sel of ['.tv-tag', '.tv-ticket', '.tv-award', '.choice', '.tag']) {
     const boxes = [...document.querySelectorAll(sel)].filter(visible).map((e) => ({ e, r: e.getBoundingClientRect() }))
     for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
       const a = boxes[i].r, b = boxes[j].r
@@ -101,6 +123,7 @@ function detect() {
       if (ow > 2 && oh > 2 && !boxes[i].e.closest('.tv-beat')) out.push(`boxes collide: ${sel} "${boxes[i].e.innerText.split('\n')[0].slice(0, 20)}" × "${boxes[j].e.innerText.split('\n')[0].slice(0, 20)}"`)
     }
   }
+  out.push(...splitWords)
   if (document.documentElement.scrollWidth > innerWidth + 1) out.push(`page scrolls sideways (${document.documentElement.scrollWidth} > ${innerWidth})`)
   // 4) tap targets on phones
   if (!tv) {
@@ -112,6 +135,33 @@ function detect() {
     }
   }
   return [...new Set(out)]
+}
+
+// Fit: on a phone turn screen (scrolled to the top), the confirm and every enabled option must sit above the
+// fixed bottom bar, so nobody has to scroll to act.
+function fitCheck() {
+  const turn = document.querySelector('.prompt.turn')
+  if (!turn) return []
+  window.scrollTo(0, 0)
+  const bar = document.querySelector('.action-bar')
+  const barTop = bar && getComputedStyle(bar).position === 'fixed' ? bar.getBoundingClientRect().top : innerHeight
+  const title = (turn.querySelector('.prompt-title')?.textContent || '').slice(0, 24)
+  const out = []
+  const conf = turn.querySelector('button.confirm')
+  if (conf && conf.getBoundingClientRect().bottom > barTop + 1) out.push(`fit: "${title}" confirm below the fold (${Math.round(conf.getBoundingClientRect().bottom)} > ${Math.round(barTop)})`)
+  // A list of up to 6 options (cards, votes, short name lists) must fit whole; longer name lists may scroll
+  // under the sticky confirm.
+  const opts = [...turn.querySelectorAll('.choice:not(.disabled)')]
+  const confTop = conf ? conf.getBoundingClientRect().top : barTop
+  const limit = Math.min(barTop, confTop)
+  const partly = opts.filter((o) => { const r = o.getBoundingClientRect(); return r.top < limit - 1 && r.bottom > limit + 1 }).length
+  const hinted = !!turn.querySelector('.more-below')
+  if (partly && !(opts.length > 6 && hinted)) out.push(`fit: "${title}" ${partly} option(s) partly covered by the confirm`)
+  const below = opts.filter((o) => o.getBoundingClientRect().top >= limit - 1).length
+  if (below && !turn.querySelector('.more-below')) out.push(`fit: "${title}" ${below} option(s) hidden with no "more" hint`)
+  const hidden = opts.length <= 6 ? opts.filter((o) => o.getBoundingClientRect().bottom > limit + 1).length : 0
+  if (hidden) out.push(`fit: "${title}" ${hidden} option(s) below the fold`)
+  return out
 }
 
 // ------------------------------------------------------------------ harness
@@ -147,6 +197,9 @@ async function audit(page, label, kind, force = false) {
   if (seenStates.has(key) && !force) return
   seenStates.add(key)
   const found = await page.evaluate(detect).catch(() => [])
+  if (kind === 'phone' && !label.startsWith('land') && !label.startsWith('tablet')) {
+    found.push(...(await page.evaluate(fitCheck).catch(() => [])).map((f) => `${f} @${label.split('#')[0]}`))
+  }
   const file = `${String(++shots).padStart(4, '0')}-${label}-${key.split('|').slice(2).filter(Boolean).join('_').replace(/[^\w-]+/g, '_').slice(0, 60)}.png`
   await page.screenshot({ path: `${OUT}/${file}` }).catch(() => {})
   for (const f of found) {
@@ -169,7 +222,7 @@ async function audit(page, label, kind, force = false) {
   }
   const host = tvs[0].page
   await host.goto(BASE + '/')
-  await host.click('text=Start a new trip on this TV')
+  await host.click('text=Host on a TV')
   await host.waitForURL(/\/[A-Z]{4}\/tv$/)
   const code = host.url().split('/').slice(-2)[0]
   for (const t of tvs) {
@@ -197,12 +250,12 @@ async function audit(page, label, kind, force = false) {
   }
   for (const t of tvs) await audit(t.page, t.name, 'tv', true)
   // Host drawer in the lobby, incl. Advanced
-  await host.click('text=👑 Host'); await host.waitForSelector('.tv-drawer')
+  await host.click('css=.tv-host-btn'); await host.waitForSelector('.tv-drawer')
   await host.click('.tv-drawer >> text=Advanced')
   await audit(host, 'tv1920', 'tv', true)
   await host.click('.tv-drawer >> text=Close')
   // A phone host view with Advanced open: hand hosting to phone 0, look, hand back.
-  await host.click('text=👑 Host')
+  await host.click('css=.tv-host-btn')
   await host.locator('.tv-drawer label:has-text("Make a player the host") select').selectOption({ label: names[0] })
   await phones[0].page.waitForSelector('text=Start the trip')
   await phones[0].page.click('text=Advanced')
@@ -240,7 +293,7 @@ async function audit(page, label, kind, force = false) {
       for (const ph of phones.slice(0, 7)) {
         const p = ph.page
         if (!(await p.locator('.game-header').count())) continue
-        await p.click('text=Catch me up'); await p.waitForSelector('.modal'); await audit(p, ph.label, 'phone', true)
+        await p.click('text=Recap'); await p.waitForSelector('.modal'); await audit(p, ph.label, 'phone', true)
         await p.click('.modal button.ghost')
         const h = p.locator('.hold-small'); const bb = await h.boundingBox()
         if (bb) { await p.mouse.move(bb.x + 10, bb.y + 10); await p.mouse.down(); await p.waitForTimeout(100); await audit(p, ph.label, 'phone', true); await p.mouse.up() }
@@ -248,12 +301,12 @@ async function audit(page, label, kind, force = false) {
     }
     if (step === 20 && !paused) {
       paused = true
-      await host.click('text=👑 Host'); await host.click('.tv-drawer >> text=Pause')
+      await host.click('css=.tv-host-btn'); await host.click('.tv-drawer >> text=Pause')
       await phones[0].page.waitForSelector('.paused-overlay')
       await host.click('.tv-drawer >> text=Close'); await host.waitForTimeout(300)
       for (const t of tvs) await audit(t.page, t.name, 'tv', true)
       for (const ph of phones.slice(0, 7)) await audit(ph.page, ph.label, 'phone', true)
-      await host.click('text=👑 Host'); await host.click('.tv-drawer >> text=Resume'); await host.click('.tv-drawer >> text=Close')
+      await host.click('css=.tv-host-btn'); await host.click('.tv-drawer >> text=Resume'); await host.click('.tv-drawer >> text=Close')
       await phones[0].page.waitForSelector('.paused-overlay', { state: 'detached' })
     }
     // Audit every phone, then one phone with a prompt acts.
@@ -273,7 +326,14 @@ async function audit(page, label, kind, force = false) {
     } else {
       const ch = turn.locator('.choice:not([disabled])'); const n = await ch.count()
       if (n) {
-        await ch.nth(pick(n)).click()
+        try {
+          await ch.nth(pick(n)).click({ timeout: 5000 })
+        } catch (e) {
+          await ph.page.screenshot({ path: `${OUT}/CLICK-FAIL-${ph.label}.png` })
+          const info = await ph.page.evaluate(() => ({ vh: innerHeight, sy: scrollY, doc: document.documentElement.scrollHeight }))
+          console.log('CLICK FAILED on', ph.label, JSON.stringify(info))
+          throw e
+        }
         await audit(ph.page, ph.label + '-selected', 'phone')
         await turn.locator('button.confirm').click()
       }
@@ -284,7 +344,7 @@ async function audit(page, label, kind, force = false) {
   await host.waitForTimeout(9000)
   for (const t of tvs) await audit(t.page, t.name, 'tv', true)
   for (const ph of phones) await audit(ph.page, ph.label, 'phone', true)
-  await host.click('text=👑 Host'); await audit(host, 'tv1920', 'tv', true)
+  await host.click('css=.tv-host-btn'); await audit(host, 'tv1920', 'tv', true)
   fs.writeFileSync(`${OUT}/issues.json`, JSON.stringify([...issues.entries()].map(([k, v]) => ({ issue: v.example, count: v.where.size, where: [...v.where].slice(0, 6) })), null, 1))
   console.log(`code ${code}: ${seenStates.size} states, ${shots} screenshots, ${issues.size} distinct issues, ${errors.length} page errors`)
   for (const [k, v] of issues) console.log(`- [${v.where.size}] ${v.example}  e.g. ${[...v.where][0]}`)
