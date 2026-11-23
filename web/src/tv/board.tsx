@@ -5,6 +5,7 @@ import type { ComponentChildren } from 'preact'
 import type { GameEvent, GameView, RoomView } from '../types'
 import { cardName, logT, powerName, roleName, term, theme, ui } from '../theme'
 import type { Connection } from '../net'
+import { ApprovedSlip } from '../approved'
 import { Icon } from '../icons'
 import { NapaScene, Vine, VineRows } from '../scenery'
 import type { Beat } from './beats'
@@ -370,6 +371,13 @@ export function BeatOverlay(props: { beat: Beat; names: string[] }) {
           </div>
           <span class={`stamp big tv-vote-result ${e.passed ? 'stamp-B' : 'stamp-O'}`} style={{ animationDelay: `${0.7 + voters.length * 0.12}s` }}>{b.title}</span>
         </div>
+      </div>
+    )
+  }
+  if (b.kind === 'approved') {
+    return (
+      <div class="tv-beat beat-approved" key={b.id}>
+        <ApprovedSlip a={{ id: b.id, ...b.data }} class="tv" />
       </div>
     )
   }

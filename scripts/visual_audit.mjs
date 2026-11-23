@@ -40,7 +40,7 @@ const SHORT_NAMES = ['Sam', 'Jo', 'Ana', 'Tom', 'Bea', 'Kit', 'Dev', 'Lu', 'Max'
 
 // ------------------------------------------------------------------ in-page detector
 function detect() {
-  const OVER = '.tv-beat, .modal-backdrop, .tv-drawer, .paused-overlay, .tv-paused, .conn-banner, .toast, .test-badge, .hold.shown, .confetti, .tv-corner, .lobby-menu, .game-header, .confirm-row'
+  const OVER = '.tv-beat, .approved-overlay, .modal-backdrop, .tv-drawer, .paused-overlay, .tv-paused, .conn-banner, .toast, .test-badge, .hold.shown, .confetti, .tv-corner, .lobby-menu, .game-header, .confirm-row'
   const tv = document.documentElement.classList.contains('tv-mode')
   const visible = (e) => {
     for (let x = e; x && x !== document.documentElement; x = x.parentElement) {

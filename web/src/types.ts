@@ -121,4 +121,5 @@ export interface Theme {
   announce: Record<string, string>
   beats: Record<string, string>
   errors?: Record<string, string>
+  approved_lines?: string[]
 }

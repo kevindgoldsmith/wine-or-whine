@@ -38,6 +38,12 @@ export function beatsFor(events: GameEvent[], names: string[], g: GameView | nul
         break
       case 'vote_result':
         add({ kind: 'vote', title: beatT(e.passed ? 'vote_pass' : 'vote_fail', { yes: e.yes, no: e.no }), sfx: 'vote_reveal', ms: 4000, data: e })
+        if (e.passed) {
+          add({
+            kind: 'approved', title: '', sfx: 'vote_pass', ms: 3400,
+            data: { day: g?.day ?? 1, pres: nm(e.president ?? g?.president), planner: nm(e.nominee ?? g?.chancellor) },
+          })
+        }
         break
       case 'meter':
         add({ kind: 'meter', title: beatT('meter', { value: e.value }), icon: 'meter', sfx: 'meter_tick', ms: 1800, data: e })

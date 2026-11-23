@@ -135,3 +135,15 @@ The first look read as generic. Of three proposed directions (mockups in a priva
 - **Audit additions:** a *fit* check (on a 320×568 phone the confirm and any short option list fit above the
   bottom bar, no option is half-hidden unless a long list shows a "↓ N more" hint), a mid-word split check
   and a coverage check. Long name lists scroll under a sticky confirm with that hint.
+
+## Planning committee and "Approved" moment (2026-11-23)
+- Wording (Kevin): the pair up for a vote is the **planning committee**; the vote approves it. "Read someone's
+  phone" is now "Read someone else's texts" everywhere (power name, log, voice, banner). Tagline: "Four couples,
+  four babies, one trip to Napa."
+- When a vote passes, the TV plays an extra beat and every phone shows an overlay: a committee slip drops in,
+  an APPROVED stamp slams onto it, and a handwritten one-liner appears. Lines live in the theme
+  (`approved_lines`) so they're easy to iterate. The line is picked from the day number, so the TV and all
+  phones show the same one, and consecutive days don't repeat.
+- The phone overlay lasts about 2.8 s and taps away, so it never holds up the First One Up's card choice.
+  Discreet mode shows it plain and still; reduced-motion turns the animation off.
+- The two names are joined with "&" (it's a committee) rather than the arrow used on the boarding pass.

@@ -1,7 +1,7 @@
 {
   "id": "wine_or_whine",
   "name": "Wine or Whine",
-  "tagline": "Four couples, their infants, one trip to Napa.",
+  "tagline": "Four couples, four babies, one trip to Napa.",
   "credit": "Adapted from Secret Hitler by Goat, Wolf & Cabbage · CC BY-NC-SA 4.0",
   "terms": {
     "chill_team": "Chill Parents",
@@ -18,7 +18,7 @@
     "over_card": "Overscheduled Day",
     "over_plural": "Overscheduled Days",
     "meter": "Indecision meter",
-    "investigate": "Read someone's phone",
+    "investigate": "Read someone else's texts",
     "special_election": "Breakfast duty",
     "peek": "Check the nap schedule",
     "execute": "Babysitter duty",
@@ -67,7 +67,7 @@
     ]
   },
   "power_desc": {
-    "investigate": "Read someone's phone: you privately see which team they're on.",
+    "investigate": "Read someone else's texts: you privately see which team they're on.",
     "special_election": "Assign breakfast duty: they'll be up first tomorrow.",
     "peek": "Check the nap schedule: you privately see the next 3 days.",
     "execute": "Assign babysitter duty: they stay back at the rental and are out."
@@ -169,7 +169,7 @@
     "role_plain_team": "Team: {team}",
     "role_plain_role": "Role: {role}",
     "you_are_pres": "Pick a Day Planner.",
-    "you_vote": "Vote: should {pres} and {nominee} plan today?",
+    "you_vote": "Approve today's planning committee: {pres} and {nominee}?",
     "you_discard": "Throw one day away.",
     "you_discard_sub": "Shh, no talking. Bin one; the other two go to {name}.",
     "you_enact": "Play one day.",
@@ -201,7 +201,7 @@
     "result_done": "Done",
     "result_investigate": "{name} is on Team {team}.",
     "result_peek": "The next 3 days, in order:",
-    "result_phone_read": "Your phone was read by {name}.",
+    "result_phone_read": "{name} read your texts.",
     "my_results": "My private results",
     "eligible_reason_self": "That's you",
     "eligible_reason_sleeping": "Sleeping in",
@@ -282,7 +282,7 @@
     "tv_s_nominate": "Picking today's Day Planner",
     "tv_sleeping": "Sleeping in: {names}",
     "tv_h_vote": "{pres} → {nominee}?",
-    "tv_s_vote": "Everyone votes on today's plan · {n} left",
+    "tv_s_vote": "Everyone votes on today's planning committee · {n} left",
     "tv_h_shh": "Shh…",
     "tv_h_veto": "Veto?",
     "tv_rail_breezy": "Breezy Days · 5 to win",
@@ -305,8 +305,8 @@
     "card_kicker": "Day card",
     "card_sub_breezy": "Naps, lunch, a tasting",
     "card_sub_over": "Nine stops, no naps",
-    "pass_title": "Proposed plan",
-    "power_short_investigate": "Read a phone",
+    "pass_title": "Proposed planning committee",
+    "power_short_investigate": "Read texts",
     "power_short_special_election": "Breakfast duty",
     "power_short_peek": "Nap check",
     "power_short_execute": "Babysitter",
@@ -338,12 +338,14 @@
     "more_below": "↓ {n} more",
     "you_won": "You won!",
     "you_lost": "You lost.",
-    "power_kicker": "Day {n} · your power"
+    "power_kicker": "Day {n} · your power",
+    "approved_stamp": "Approved",
+    "approved_kicker": "Day {n} · planning committee"
   },
   "hints": {
     "reveal": "Your role is secret. Overschedulers know each other; Chill Parents know nothing.",
     "nominate": "Pick someone you trust. If the group votes Yes, you two decide today's card.",
-    "vote": "Yes means you trust this pair. A tie fails. Three failed votes in a row and the babies pick a random card.",
+    "vote": "Yes approves this planning committee. A tie fails. Three failed votes in a row and the babies pick a random card.",
     "pres_discard": "Overschedulers may lie about what they binned. So may you.",
     "chanc_enact": "You can claim anything about the other card.",
     "veto_response": "If you agree, both cards are thrown away and the Indecision meter goes up.",
@@ -367,7 +369,7 @@
     "veto_proposed": "{planner} proposed a veto.",
     "veto_accepted": "{pres} agreed. Both cards were thrown away.",
     "veto_refused": "{pres} refused the veto.",
-    "power_investigate": "{pres} read {target}'s phone.",
+    "power_investigate": "{pres} read {target}'s texts.",
     "power_special_election": "{pres} gave {target} breakfast duty.",
     "power_peek": "{pres} checked the nap schedule.",
     "power_execute": "{pres} sent {target} to babysitter duty.",
@@ -393,7 +395,7 @@
   },
   "announce": {
     "day_start": "Day {day}. {pres} is up first.",
-    "nominated": "{pres} picked {nominee} to plan the day.",
+    "nominated": "{pres} picked {nominee} for the planning committee.",
     "vote_pass": "The vote passes.",
     "vote_fail": "The vote fails.",
     "forced": "The babies decided!",
@@ -402,7 +404,7 @@
     "veto_proposed": "{planner} wants to veto.",
     "veto_accepted": "Veto accepted.",
     "veto_refused": "Veto refused.",
-    "power_investigate": "{pres} is reading {target}'s phone.",
+    "power_investigate": "{pres} is reading {target}'s texts.",
     "power_special_election": "{target} has breakfast duty tomorrow.",
     "power_peek": "{pres} is checking the nap schedule.",
     "power_execute": "{target} has been assigned babysitter duty.",
@@ -422,7 +424,7 @@
     "veto_proposed": "{planner} proposes a veto…",
     "veto_accepted": "Veto accepted. Both cards tossed.",
     "veto_refused": "Veto refused!",
-    "power_investigate": "{pres} is reading {target}'s phone",
+    "power_investigate": "{pres} is reading {target}'s texts",
     "power_special_election": "{target} has breakfast duty",
     "power_peek": "{pres} checks the nap schedule",
     "power_execute": "{target} stays home with the babies",
@@ -433,5 +435,19 @@
     "card_count_O": "Overscheduled Day {n} of 6",
     "stakes_B": "{n} more for the best trip ever",
     "stakes_O": "{n} more and the trip is over"
-  }
+  },
+  "approved_lines": [
+    "Motion carried. Someone pack the snacks.",
+    "Nap schedules everywhere tremble.",
+    "The committee is seated. The babies have not been consulted.",
+    "Democracy, but make it rosé.",
+    "Passed by a show of sticky hands.",
+    "Congratulations. You're responsible now.",
+    "The people have spoken. The toddlers are still babbling.",
+    "Subject to one more winery.",
+    "A mandate! Or at least a majority.",
+    "Strollers at the ready.",
+    "Bold choice. The diaper bag is packed.",
+    "May your tasting notes be ever in your favour."
+  ]
 }
