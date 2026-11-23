@@ -194,3 +194,5 @@ The first look read as generic. Of three proposed directions (mockups in a priva
 ## "First One Awake" (2026-11-23)
 - The president role is now "First One Awake" (was "First One Up"), and the matching phrases say "wakes up
   first" ("Day 3. Sarah wakes up first."; breakfast duty: "they'll wake up first tomorrow").
+- The peek power is "Check the forecast" (short label "Forecast"), with a sun-and-cloud icon; "Nap check" wasn't
+  intuitive (Kevin picked it from four options).

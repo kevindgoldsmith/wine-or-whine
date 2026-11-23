@@ -42,8 +42,9 @@ const P: Record<string, JSX.Element> = {
   ),
   peek: (
     <>
-      <circle cx="12" cy="13" r="8" />
-      <path d="M12 9v4l3 2M9 2.5h6" />
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M9 1.8v1.4M3.2 8H1.8M4.6 3.6l1 1M13.4 3.6l-1 1" />
+      <path d="M7 20h11a3.5 3.5 0 0 0 .4-7 5 5 0 0 0-9.6-1A4 4 0 0 0 7 20z" />
     </>
   ),
   execute: (
