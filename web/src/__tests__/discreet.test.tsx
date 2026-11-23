@@ -69,7 +69,7 @@ describe('discreet mode', () => {
   })
 
   it('looks the same whatever the cards are (only the words differ)', () => {
-    const strip = (h: string) => h.replace(/Breezy Day|Overscheduled Day/g, 'CARD')
+    const strip = (h: string) => h.replace(/Breezy Agenda|Overscheduled Agenda/g, 'CARD')
     const variants = ['BBB', 'BBO', 'BOO', 'OOO'].map((h) => strip(wrap(<HandPrompt hand={h.split('') as any} mode="discard" send={noop} />)))
     expect(new Set(variants).size).toBe(1)
     const votes = new Set(Array.from({ length: 20 }, () => wrap(<VotePrompt send={noop} />).replace(/>(Yes|No)</g, '>X<')))
@@ -97,7 +97,7 @@ describe('discreet mode', () => {
     const peek = wrap(<ResultBody r={{ type: 'peek', day: 1, cards: ['B', 'O', 'O'] }} />)
     expect(peek).not.toMatch(EMOJI)
     const inv = wrap(<ResultBody r={{ type: 'investigate', day: 1, target: 2, team: 'over' }} />)
-    expect(inv).toContain('Priya is on Team Overschedulers')
+    expect(inv).toContain('Priya is an Overscheduler.')
   })
 
   it('normal mode lays cards out in equal grid columns; only the veto button gets its own row', () => {

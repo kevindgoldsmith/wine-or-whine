@@ -207,3 +207,20 @@ The first look read as generic. Of three proposed directions (mockups in a priva
 - Narration: Kevin declined an OpenAI key, so the voice is Kokoro (Apache-2.0, "af_heart"), run locally from the
   kokoro-onnx GitHub release. Each caption window stretches to fit its line (174 s → ~184 s); the music is
   ducked under the voice. Sources in `scripts/explainer/`; the mp4, wav and model files aren't committed.
+
+## Theme coherence pass (2026-11-23)
+Kevin asked for all proposed coherence fixes except renaming Veto, with two corrections: every family flies to
+Napa, so the airline touches (Now boarding, boarding pass) stay; and the cards are "daily agendas".
+- Cards are **daily agendas**: Breezy Agenda / Overscheduled Agenda (prompts: "Throw one agenda away", "Play one
+  agenda"; card kicker "Daily agenda"). Played-day counts and the TV rails use the same names.
+- One word per thing: the stamp now says **Overscheduled** (was "Overbooked"); being out is **Babysitting** on tags
+  and "stays back at the house" in sentences (was also "Stayed home" / "stays home with the babies").
+- **One joke per agenda slot**: the card-moment one-liners replaced the old fixed captions as the theme's tracks, so
+  the slip, the trip journal and the history all use the same line. The 3 Breezy and 2 Overscheduled lines beyond
+  the 5/6 slots were dropped.
+- Rails read the same for both teams: "Breezy Agendas · 5 for the best trip ever", "Overscheduled Agendas · 6 for
+  a meltdown" (was "5 to win / 6 to lose").
+- "Travellers" → "Travelers" (US spelling); bottom-bar "Hold: tag" → "My role"; investigate result "Sam is a Chill
+  Parent / an Overscheduler" (was "on Team …"); forecast result "The forecast for the next 3 days:".
+- Stamps sized down where "Overscheduled" is tight (TV tickets, phone slip). The explainer video was updated to
+  match and re-narrated.

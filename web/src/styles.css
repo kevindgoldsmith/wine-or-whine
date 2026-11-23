@@ -953,3 +953,9 @@ html.discreet .tag-vote.voted, html.discreet .tag.president .tag-vote.voted { co
 .rail-B .card-bd { color: var(--vine); }
 .rail-O .card-bd { color: var(--stamp); }
 html.discreet .card-bd { display: none; }
+/* "Overscheduled" is longer than "Overbooked": smaller stamps where space is tight */
+.rail-O .tv-ticket .stamp { font-size: 0.5rem; letter-spacing: 0.02em; padding: 0.05rem 0.25rem; border-width: 0.14rem; }
+.slip-stamp.stamp-O { font-size: 1.5rem; letter-spacing: 0.04em; }
+.card-slip.tv .slip-stamp.stamp-O { font-size: 3.2rem; }
+.slip-head { letter-spacing: 0.06em; }
+@media (max-width: 379px) { .slip-head { font-size: 0.62rem; } .slip-stamp.stamp-O { font-size: 1.3rem; } }

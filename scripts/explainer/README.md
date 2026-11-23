@@ -12,3 +12,5 @@ A narrated, ~3-minute explainer in the game's look, rendered from `explainer.htm
 
 Captions and chapters live in the `CH` and `CAP` arrays at the top of the script; keep them in the theme's wording.
 Generated files (wav, mp4, models) are not committed.
+
+After changing captions: `python3 voice.py` → `python3 update_timemap.py` → mix → render.

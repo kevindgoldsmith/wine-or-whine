@@ -122,5 +122,4 @@ export interface Theme {
   announce: Record<string, string>
   beats: Record<string, string>
   errors?: Record<string, string>
-  card_lines?: Record<string, string[]>
 }

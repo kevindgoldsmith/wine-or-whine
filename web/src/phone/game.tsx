@@ -184,7 +184,7 @@ export function ResultBody(props: { r: PrivateResult }) {
   const { names, discreet } = useGame()
   const r = props.r
   if (r.type === 'investigate') {
-    return <p class="result-text">{ui('result_investigate', { name: names[r.target!], team: teamName(r.team!) })}</p>
+    return <p class="result-text">{ui('result_investigate', { name: names[r.target!], team_a: term(r.team === 'chill' ? 'chill_a' : 'over_a_one') })}</p>
   }
   return (
     <div>

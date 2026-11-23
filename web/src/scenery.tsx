@@ -62,7 +62,7 @@ export function VineyardBand(props: { class?: string }) {
   )
 }
 
-/** A tiny vineyard vignette (the Breezy Day ticket stub). */
+/** A tiny vineyard vignette (the Breezy Agenda ticket stub). */
 export function MiniVineyard(props: { class?: string }) {
   return (
     <svg class={props.class} viewBox="0 0 64 96" preserveAspectRatio="xMidYMid slice" aria-hidden="true">

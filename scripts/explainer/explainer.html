@@ -87,7 +87,7 @@ html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; backgro
 .ticket .lbl { position: absolute; left: 14px; top: 12px; font-family: var(--sans); font-weight: 600; font-size: 20px; color: var(--stamp); }
 .ticket .fill { position: absolute; inset: 0; background: var(--paper); opacity: 0; }
 .ticket .stamp { position: relative; font-size: 20px; border-width: 4px; padding: 2px 8px; opacity: 0; }
-.rail.O .ticket .stamp { font-size: 15px; padding: 2px 5px; }
+.rail.O .ticket .stamp { font-size: 13px; padding: 2px 4px; letter-spacing: 0.04em; }
 
 /* phone frame */
 .phone { width: 300px; height: 600px; border-radius: 44px; background: #181d2c; padding: 16px; box-shadow: 0 30px 60px rgba(40, 25, 5, 0.35); }
@@ -188,9 +188,9 @@ const CAP = [
   [15, 20.6, 'But two Overschedulers and their boss, the Chief Overscheduler, want chaos.'],
   [21.4, 27, 'Overschedulers know each other, and they know who the Chief is.'],
   [27, 32.6, "The Chief doesn't know their teammates. Chill Parents know nothing at all."],
-  [33.4, 38, 'Every day, one card gets played: a Breezy Day or an Overscheduled Day.'],
-  [38, 43.5, 'Chill Parents win with 5 Breezy Days. Overschedulers win with 6 Overscheduled Days.'],
-  [43.5, 47.6, 'Every card played is stamped on the board for everyone to see.'],
+  [33.4, 38, 'Every day, one daily agenda gets played: Breezy or Overscheduled.'],
+  [38, 43.5, 'Five Breezy Agendas and the Chill Parents win. Six Overscheduled Agendas and the Overschedulers win.'],
+  [43.5, 47.6, 'Every agenda played is stamped on the board for everyone to see.'],
   [48.4, 53, 'Each round is a new day. Someone is the First One Awake.'],
   [53, 56.6, 'The job passes to the next person around the table every day.'],
   [57.4, 62, 'The First One Awake picks someone to be the Day Planner.'],
@@ -199,23 +199,23 @@ const CAP = [
   [73, 77, 'The stamps flip together. A majority of YES approves the committee.'],
   [77, 80.6, 'A tie, or a majority of NO, means the vote fails.'],
   [81.4, 85, 'Every failed vote moves the indecision meter up one.'],
-  [85, 90, 'Three in a row and the babies decide: the top card is played automatically.'],
+  [85, 90, 'Three in a row and the babies decide: the top agenda is played automatically.'],
   [90, 92.6, 'Then the meter resets.'],
-  [93.4, 98, 'If the vote passes, the First One Awake secretly draws three cards.'],
+  [93.4, 98, 'If the vote passes, the First One Awake secretly draws three daily agendas.'],
   [98, 102, 'They bin one and pass the other two to the Day Planner.'],
   [102, 106, 'The Day Planner plays one. No talking: the babies are asleep.'],
   [106, 110.6, "Then anyone can claim anything. That's where the lying starts."],
-  [111.4, 116, 'The deck has 6 Breezy Days and 11 Overscheduled Days.'],
+  [111.4, 116, 'The deck has 6 Breezy Agendas and 11 Overscheduled Agendas.'],
   [116, 120.6, "So even honest players get bad hands, and nobody can prove who's lying."],
-  [121.4, 126, 'Overscheduled Days unlock powers for the First One Awake.'],
+  [121.4, 126, 'Overscheduled Agendas unlock powers for the First One Awake.'],
   [126, 131, "Read someone else's texts: secretly see one player's team."],
   [131, 136, 'Breakfast duty: choose who wakes up first tomorrow.'],
   [136, 141, 'Babysitter duty: that player stays back at the house and is out.'],
   [141, 145.6, 'After the fifth, the planning committee can agree to veto a bad hand.'],
-  [146.4, 150, 'Careful: after 3 Overscheduled Days, if the Chief becomes Day Planner…'],
+  [146.4, 150, 'Careful: after 3 Overscheduled Agendas, if the Chief becomes Day Planner…'],
   [150, 153, '…the Overschedulers win instantly.'],
   [153, 155.6, 'But put the Chief on babysitter duty, and the Chill Parents win.'],
-  [156.4, 160.5, 'Your phone is private: your role, your cards, your turn.'],
+  [156.4, 160.5, 'Your phone is private: your role, your agendas, your turn.'],
   [160.5, 164.6, 'The TV shows the board everyone can see. Keep your phone to yourself.'],
 ]
 for (const [t0, t1, n, label] of CH) show(add(`<div class="chapter"><b>${String(n).padStart(2, '0')}</b>${label}</div>`), t0 + 0.2, t1 - 0.1)
@@ -282,10 +282,10 @@ const bd = (k) => `<span class="bd" style="color:${k === 'B' ? '#2f5a3b' : '#b03
 // ---------------------------------------------------------------- 3 how to win
 {
   const s = scene(33, 48)
-  const tk = (k, n, lab) => `<div class="ticket">${bd(k)}<div class="fill"></div>${lab ? `<span class="lbl" style="color:${k === 'B' ? 'var(--vine)' : 'var(--stamp)'}">${lab}</span>` : ''}<span class="stamp ${k === 'B' ? 'g' : 'r'}">${k === 'B' ? 'Breezy' : 'Overbooked'}</span><span class="no">${String(n).padStart(2, '0')}</span></div>`
+  const tk = (k, n, lab) => `<div class="ticket">${bd(k)}<div class="fill"></div>${lab ? `<span class="lbl" style="color:${k === 'B' ? 'var(--vine)' : 'var(--stamp)'}">${lab}</span>` : ''}<span class="stamp ${k === 'B' ? 'g' : 'r'}">${k === 'B' ? 'Breezy' : 'Overscheduled'}</span><span class="no">${String(n).padStart(2, '0')}</span></div>`
   const b = into(s, `<div class="center" style="top:44%;display:grid;gap:40px">
-    <div class="rail B"><h4>${I('breezy')} Breezy Days · 5 to win</h4><div class="tickets">${[1, 2, 3, 4, 5].map((n) => tk('B', n, n === 5 ? 'Win' : '')).join('')}</div></div>
-    <div class="rail O"><h4>${I('over')} Overscheduled Days · 6 to lose</h4><div class="tickets">${[1, 2, 3, 4, 5, 6].map((n) => tk('O', n, n === 6 ? 'Lose' : '')).join('')}</div></div></div>`)
+    <div class="rail B"><h4>${I('breezy')} Breezy Agendas · 5 for the best trip ever</h4><div class="tickets">${[1, 2, 3, 4, 5].map((n) => tk('B', n, n === 5 ? 'Win' : '')).join('')}</div></div>
+    <div class="rail O"><h4>${I('over')} Overscheduled Agendas · 6 for a meltdown</h4><div class="tickets">${[1, 2, 3, 4, 5, 6].map((n) => tk('O', n, n === 6 ? 'Lose' : '')).join('')}</div></div></div>`)
   A(b, { opacity: 0, transform: 'translate(-50%, -46%)' }, { opacity: 1, transform: 'translate(-50%, -50%)' }, 33.3, 0.7)
   const tB = $$('.rail.B .ticket', b), tO = $$('.rail.O .ticket', b)
   const stampIt = (t, at) => { show($('.fill', t), at, undefined, 0.2); slam($('.stamp', t), at, [-8, 5, -4, 7, -6, 4][Math.floor(at * 7) % 6]) }
@@ -353,7 +353,7 @@ const bd = (k) => `<span class="bd" style="color:${k === 'B' ? '#2f5a3b' : '#b03
   dots.forEach((d) => A(d, { opacity: 1 }, { opacity: 0 }, 90.3, 0.4))
   const babies = into(s, `<div style="position:absolute;left:50%;top:560px;transform:translateX(-50%);display:flex;align-items:center;gap:60px">
     <div class="tapenote">The babies decided!</div>
-    <div class="ticket" style="width:170px;height:210px;background:var(--paper)">${bd('O')}<span class="stamp r" style="opacity:1;font-size:24px;transform:rotate(-6deg)">Overbooked</span></div></div>`)
+    <div class="ticket" style="width:170px;height:210px;background:var(--paper)">${bd('O')}<span class="stamp r" style="opacity:1;font-size:15px;letter-spacing:0.03em;padding:2px 5px;transform:rotate(-6deg)">Overscheduled</span></div></div>`)
   pop(babies.firstElementChild, 86.4, 0.5, 'rotate(-8deg) scale(0.8)', 'rotate(-2deg) scale(1)')
   A(babies.lastElementChild, { opacity: 0, transform: 'translateY(-80px) rotate(-14deg)' }, { opacity: 1, transform: 'translateY(0) rotate(3deg)' }, 87.2, 0.6)
   const reset = into(s, `<div style="position:absolute;left:50%;top:470px;transform:translateX(-50%)"><span class="chip">Meter resets</span></div>`)
@@ -370,7 +370,7 @@ const bd = (k) => `<span class="bd" style="color:${k === 'B' ? '#2f5a3b' : '#b03
   $$('.who', stage).forEach((w) => { w.style.position = 'absolute'; w.style.top = '-60px'; w.style.transform = 'translateX(-50%)' })
   const shh = into(s, `<div style="position:absolute;left:822px;top:640px;transform:rotate(-3deg)"><div class="tapenote" style="font-size:40px">Shh — no talking<br>till it's played.</div></div>`)
   pop(shh, 94.6)
-  const card = (k, extra = '') => `<div class="card ${k}" ${extra}>${bd(k)}<span class="k">Day card</span><span class="t">${k === 'B' ? 'Breezy Day' : 'Overscheduled Day'}</span><span class="stamp ${k === 'B' ? 'g' : 'r'}">${k === 'B' ? 'Binned' : 'Played'}</span></div>`
+  const card = (k, extra = '') => `<div class="card ${k}" ${extra}>${bd(k)}<span class="k">Daily agenda</span><span class="t">${k === 'B' ? 'Breezy Agenda' : 'Overscheduled Agenda'}</span><span class="stamp ${k === 'B' ? 'g' : 'r'}">${k === 'B' ? 'Binned' : 'Played'}</span></div>`
   // Three cards drawn on the left phone (absolute in stage so they can travel between phones)
   const cx0 = L + 16 + 16, cw = 300 - 32 - 32
   const cards = ['B', 'O', 'O'].map((k, i) => into(s, `<div style="position:absolute;left:${cx0}px;top:${300 + i * 118}px;width:${cw}px">${card(k)}</div>`))
@@ -384,8 +384,8 @@ const bd = (k) => `<span class="bd" style="color:${k === 'B' ? '#2f5a3b' : '#b03
   const playedStamp = $('.stamp', cards[1]); slam(playedStamp, 102.8, -6)
   A(cards[2], { opacity: 1 }, { opacity: 0.35 }, 103.4, 0.4)
   // card moment
-  const slip = into(s, `<div style="position:absolute;left:50%;top:200px;margin-left:-310px"><div class="slip"><div class="hd"><span>Day 4</span><span>Overscheduled Day 2 of 6</span></div>
-    <span class="stamp r">Overbooked</span><div class="ln">Six wineries before lunch. Bold.</div><div class="sk">4 more and the trip is over</div></div></div>`)
+  const slip = into(s, `<div style="position:absolute;left:50%;top:200px;margin-left:-310px"><div class="slip"><div class="hd"><span>Day 4</span><span>Overscheduled Agenda 2 of 6</span></div>
+    <span class="stamp r">Overscheduled</span><div class="ln">Six wineries before lunch. Bold.</div><div class="sk">4 more and the trip is over</div></div></div>`)
   pop(slip, 104.2, 0.45, 'translateY(-50px) rotate(-3deg)', 'translateY(0) rotate(-1deg)')
   slam($('.stamp', slip), 104.6, -4)
   A(slip, { opacity: 1 }, { opacity: 0 }, 106.4, 0.4)
@@ -401,7 +401,7 @@ const bd = (k) => `<span class="bd" style="color:${k === 'B' ? '#2f5a3b' : '#b03
     const g = into(s, `<div style="position:absolute;left:${x}px;top:330px;width:10px;height:10px"></div>`)
     for (let i = 0; i < n; i++) {
       const a = (i - (n - 1) / 2) * (k === 'B' ? 7 : 4.6)
-      const c = into(g, `<div class="ticket" style="position:absolute;left:-85px;top:0;width:170px;height:220px;background:var(--paper);transform-origin:50% 140%;box-shadow:inset 0 0 0 2px var(--rule),0 6px 12px rgba(0,0,0,.12)">${bd(k)}<span class="stamp ${k === 'B' ? 'g' : 'r'}" style="opacity:1;font-size:20px">${k === 'B' ? 'Breezy' : 'Overbooked'}</span></div>`)
+      const c = into(g, `<div class="ticket" style="position:absolute;left:-85px;top:0;width:170px;height:220px;background:var(--paper);transform-origin:50% 140%;box-shadow:inset 0 0 0 2px var(--rule),0 6px 12px rgba(0,0,0,.12)">${bd(k)}<span class="stamp ${k === 'B' ? 'g' : 'r'}" style="opacity:1;font-size:${k === 'B' ? 20 : 14}px;letter-spacing:0.03em">${k === 'B' ? 'Breezy' : 'Overscheduled'}</span></div>`)
       A(c, { opacity: 0, transform: 'rotate(0deg) translateY(40px)' }, { opacity: 1, transform: `rotate(${a}deg) translateY(0)` }, 111.4 + i * 0.06, 0.6)
     }
     return g
@@ -467,8 +467,8 @@ const bd = (k) => `<span class="bd" style="color:${k === 'B' ? '#2f5a3b' : '#b03
   const tv = into(s, `<div style="position:absolute;left:820px;top:260px"><div class="tv"><div class="scr">
     <div class="journal"><h6>Trip journal</h6><div>DAY 1 Sam picked Priya. Passed 6–2. Breezy.</div><div>DAY 2 Priya picked Theo. Failed 3–5.</div><div>DAY 3 Jordan picked Mia. Passed 5–3. Overscheduled.</div><div>DAY 4 Mia is up…</div></div>
     <div style="display:grid;gap:16px;align-content:center">
-      <div class="rail B" style="gap:8px"><h4 style="font-size:15px">${I('breezy')} Breezy · 5 to win</h4><div class="tickets" style="gap:8px">${[1, 2, 3, 4, 5].map((n) => `<div class="ticket" style="width:80px;height:100px;${n === 1 ? 'background:var(--paper)' : ''}">${bd('B')}${n === 1 ? '<span class="stamp g" style="opacity:1;font-size:12px;border-width:3px">Breezy</span>' : ''}</div>`).join('')}</div></div>
-      <div class="rail O" style="gap:8px"><h4 style="font-size:15px">${I('over')} Overscheduled · 6 to lose</h4><div class="tickets" style="gap:8px">${[1, 2, 3, 4, 5, 6].map((n) => `<div class="ticket" style="width:66px;height:100px;${n === 1 ? 'background:var(--paper)' : ''}">${bd('O')}${n === 1 ? '<span class="stamp r" style="opacity:1;font-size:10px;border-width:3px;padding:1px 4px">Overbooked</span>' : ''}</div>`).join('')}</div></div>
+      <div class="rail B" style="gap:8px"><h4 style="font-size:15px">${I('breezy')} Breezy · 5 = best trip ever</h4><div class="tickets" style="gap:8px">${[1, 2, 3, 4, 5].map((n) => `<div class="ticket" style="width:80px;height:100px;${n === 1 ? 'background:var(--paper)' : ''}">${bd('B')}${n === 1 ? '<span class="stamp g" style="opacity:1;font-size:12px;border-width:3px">Breezy</span>' : ''}</div>`).join('')}</div></div>
+      <div class="rail O" style="gap:8px"><h4 style="font-size:15px">${I('over')} Overscheduled · 6 = meltdown</h4><div class="tickets" style="gap:8px">${[1, 2, 3, 4, 5, 6].map((n) => `<div class="ticket" style="width:66px;height:100px;${n === 1 ? 'background:var(--paper)' : ''}">${bd('O')}${n === 1 ? '<span class="stamp r" style="opacity:1;font-size:8px;border-width:2px;padding:1px 3px;letter-spacing:0">Overscheduled</span>' : ''}</div>`).join('')}</div></div>
     </div></div></div><div style="position:absolute;left:450px;top:-60px;transform:translateX(-50%)"><span class="chip green">Everyone</span></div></div>`)
   pop(tv, 160.6, 0.6, 'translateY(60px)', 'translateY(0)')
 }
@@ -487,7 +487,7 @@ const bd = (k) => `<span class="bd" style="color:${k === 'B' ? '#2f5a3b' : '#b03
 
 // Pause everything; the recorder sets the time.
 document.getAnimations().forEach((a) => a.pause())
-const TMAP = [[0.0, 0.0], [0.8, 0.8], [6.0, 6.0], [6.6, 6.6], [10.0, 10.0], [15.0, 15.0], [20.6, 20.6], [21.4, 21.4], [27.0, 27.0], [32.6, 32.6], [33.4, 33.4], [38.0, 38.68633333333333], [43.5, 45.096624999999996], [47.6, 49.196625], [48.4, 49.996624999999995], [53.0, 54.596624999999996], [56.6, 58.83087499999999], [57.4, 59.63087499999999], [62.0, 64.230875], [68.6, 70.83087499999999], [69.4, 71.630875], [73.0, 76.26683333333334], [77.0, 80.72525], [80.6, 84.66095833333334], [81.4, 85.46095833333335], [85.0, 89.39370833333335], [90.0, 94.59466666666668], [92.6, 97.19466666666668], [93.4, 97.99466666666669], [98.0, 102.78133333333335], [102.0, 106.78133333333335], [106.0, 111.30045833333335], [110.6, 115.90045833333335], [111.4, 116.70045833333336], [116.0, 121.30045833333335], [120.6, 126.34070833333335], [121.4, 127.14070833333336], [126.0, 131.74070833333337], [131.0, 136.74070833333337], [136.0, 141.74070833333337], [141.0, 146.74070833333337], [145.6, 151.34070833333337], [146.4, 152.14070833333338], [150.0, 157.29141666666672], [153.0, 160.29141666666672], [155.6, 164.4178333333334], [156.4, 165.2178333333334], [160.5, 169.3178333333334], [164.6, 174.08100000000007], [165.8, 175.2810000000001], [174.0, 183.48100000000008], [174.5, 183.98100000000008]]
+const TMAP = [[0.0, 0.0], [0.8, 0.8], [6.0, 6.0], [6.6, 6.6], [10.0, 10.0], [15.0, 15.0], [20.6, 20.6], [21.4, 21.4], [27.0, 27.0], [32.6, 32.6], [33.4, 33.4], [38.0, 38.501], [43.5, 46.14820833333333], [47.6, 50.403166666666664], [48.4, 51.20316666666666], [53.0, 55.80316666666666], [56.6, 60.03741666666666], [57.4, 60.837416666666655], [62.0, 65.43741666666665], [68.6, 72.03741666666664], [69.4, 72.83741666666666], [73.0, 77.47337499999999], [77.0, 81.93179166666665], [80.6, 85.86749999999999], [81.4, 86.6675], [85.0, 90.60025], [90.0, 95.99216666666666], [92.6, 98.59216666666666], [93.4, 99.39216666666667], [98.0, 104.79454166666667], [102.0, 108.79454166666667], [106.0, 113.31366666666668], [110.6, 117.91366666666667], [111.4, 118.71366666666668], [116.0, 123.78033333333335], [120.6, 128.82058333333333], [121.4, 129.62058333333334], [126.0, 134.33725], [131.0, 139.33725], [136.0, 144.33725], [141.0, 149.33725], [145.6, 153.93725], [146.4, 154.73725000000002], [150.0, 160.23791666666668], [153.0, 163.23791666666668], [155.6, 167.36433333333335], [156.4, 168.16433333333336], [160.5, 172.26433333333335], [164.6, 177.02750000000003], [165.8, 178.22750000000005], [174.0, 186.42750000000004], [174.5, 186.92750000000004]]
 // Video time -> animation time: piecewise linear, so caption windows stretch to fit the narration.
 const toOld = (t) => { for (let i = 1; i < TMAP.length; i++) { const [o0, n0] = TMAP[i - 1], [o1, n1] = TMAP[i]; if (t <= n1) return n1 === n0 ? o1 : o0 + ((t - n0) * (o1 - o0)) / (n1 - n0) } return TMAP[TMAP.length - 1][0] }
 window.setTime = (ms) => { const o = toOld(ms / 1000) * 1000; for (const a of document.getAnimations()) a.currentTime = o }

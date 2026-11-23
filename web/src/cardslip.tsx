@@ -1,4 +1,4 @@
-// The card moment: whenever a day card is played, a slip drops in, a BREEZY / OVERBOOKED stamp slams onto it
+// The agenda moment: whenever a daily agenda is played, a slip drops in, a BREEZY / OVERSCHEDULED stamp slams onto it
 // and a handwritten one-liner appears. Shown on the TV (as the card beat) and on every phone (as a short
 // overlay). The line is picked from the card count, so the TV and all phones show the same one and the
 // lines don't repeat within a game.
@@ -12,7 +12,8 @@ export interface CardMoment {
 }
 
 export function cardLine(card: 'B' | 'O', count: number): string {
-  const lines = theme()?.card_lines?.[card] ?? []
+  // One joke per slot: the theme's tracks (5 Breezy, 6 Overscheduled), also used in the log.
+  const lines = (card === 'B' ? theme()?.tracks.breezy : theme()?.tracks.over) ?? []
   if (!lines.length) return ''
   return lines[(Math.max(1, count) - 1) % lines.length]
 }

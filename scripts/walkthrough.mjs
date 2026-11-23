@@ -3,7 +3,7 @@
 //
 //   node scripts/walkthrough.mjs http://localhost:8000 ./walkthrough-out [players=7] [seed=1] [steer=over|mixed] [tag=a]
 //
-// steer=over: bots push Overscheduled Days (powers, veto). steer=mixed: Over until 3, then Breezy.
+// steer=over: bots push Overscheduled Agendas (powers, veto). steer=mixed: Over until 3, then Breezy.
 import { createRequire } from 'node:module'
 import fs from 'node:fs'
 const require = createRequire(import.meta.url)

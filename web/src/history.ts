@@ -52,7 +52,7 @@ export function logLine(e: GameEvent, names: Names): string | null {
   }
 }
 
-/** "Day 4: Tom (First One Awake) picked Priya (Day Planner). Vote passed 5–3. An Overscheduled Day was played. …" */
+/** "Day 4: Tom (First One Awake) picked Priya (Day Planner). Vote passed 5–3. An Overscheduled Agenda was played. …" */
 export function daySummaries(history: GameEvent[], names: Names, lastN = 3): { day: number; text: string }[] {
   const days = new Map<number, GameEvent[]>()
   for (const e of history) {
