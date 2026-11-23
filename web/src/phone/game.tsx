@@ -3,7 +3,7 @@ import type { Card, GameView, PrivateResult, RoomView } from '../types'
 import { cardName, hint, powerName, roleName, teamName, term, theme, ui } from '../theme'
 import { Icon } from '../icons'
 import { MiniVineyard, VineyardBand } from '../scenery'
-import { itineraryDays, tagStatus } from '../tv/board'
+import { itineraryDays, tagStatus, VoteMark } from '../tv/board'
 import { fullLog, noneYet } from '../history'
 import type { Connection } from '../net'
 import { ChoiceList, HoldReveal, Hint, Modal, type Option, tap, useGame } from './common'
@@ -333,6 +333,7 @@ export function Table(props: { g: GameView }) {
           <li class={`tag ${st?.kind ?? ''} ${i === me ? 'me' : ''}`}>
             <span class="tag-name">{n}{i === me ? <em> ({ui('lobby_you')})</em> : null}</span>
             {st ? <span class="tag-status">{st.icon ? <Icon name={st.icon} /> : null}{st.text}</span> : null}
+            <VoteMark st={st} class="tag-status tag-vote" />
           </li>
         )
       })}

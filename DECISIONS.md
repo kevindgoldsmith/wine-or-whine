@@ -175,3 +175,10 @@ The first look read as generic. Of three proposed directions (mockups in a priva
   so everyone starts in normal mode.
 - Kevin: no notes on the played cards in the TV's ticket rail. Played tickets show only the stamp, centred;
   the card's one-liner is shown in the card moment instead. Empty tickets still show their power.
+
+## Vote marks on role tags; "Trip journal" (2026-11-23)
+- The First One Up's tag (and the nominee's) showed only the role during a vote, so nobody could tell whether
+  they'd voted. During a vote those tags now add a second line, "Voted" with a tick or "Thinking…", on the TV
+  and on phones.
+- The TV's log sheet is titled "Trip journal" instead of "Itinerary" (Kevin).
+- The layout audit now waits a moment before checking a screen, so the "↓ N more" hint has appeared.

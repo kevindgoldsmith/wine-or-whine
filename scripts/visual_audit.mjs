@@ -196,6 +196,7 @@ async function audit(page, label, kind, force = false) {
   }
   if (seenStates.has(key) && !force) return
   seenStates.add(key)
+  await page.waitForTimeout(60) // let layout effects (e.g. the "more below" hint) settle
   const found = await page.evaluate(detect).catch(() => [])
   if (kind === 'phone' && !label.startsWith('land') && !label.startsWith('tablet')) {
     found.push(...(await page.evaluate(fitCheck).catch(() => [])).map((f) => `${f} @${label.split('#')[0]}`))

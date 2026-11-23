@@ -1,4 +1,4 @@
-// The TV board in the "Itinerary" style: a typed itinerary sheet that fills in day by day, a Napa postcard
+// The TV board in the "Itinerary" style: a typed trip-journal sheet that fills in day by day, a Napa postcard
 // carrying the live headline, ticket-stub tracks, and players as luggage tags hanging from a vine.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { ComponentChildren } from 'preact'
@@ -267,7 +267,30 @@ function Rail(props: { kind: 'B' | 'O'; filled: number; board?: (string | null)[
   )
 }
 
-export function tagStatus(g: GameView, i: number): { text: string; icon?: string; kind?: string } | null {
+export interface TagStatus { text: string; icon?: string; kind?: string; vote?: 'voted' | 'thinking' }
+
+export function tagStatus(g: GameView, i: number): TagStatus | null {
+  const st = baseStatus(g, i)
+  // The First One Up and the nominee vote too: show their vote progress alongside their role.
+  if (st && g.phase === 'vote' && g.alive[i] && (i === g.president || i === g.nominee)) {
+    return { ...st, vote: g.voted.includes(i) ? 'voted' : 'thinking' }
+  }
+  return st
+}
+
+/** A vote-progress mark for a tag that also shows a role (First One Up, nominee). */
+export function VoteMark(props: { st: TagStatus | null; class: string }) {
+  const v = props.st?.vote
+  if (!v) return null
+  return (
+    <span class={`${props.class} ${v}`}>
+      {v === 'voted' ? <Icon name="voted" /> : null}
+      {ui(v === 'voted' ? 'tv_tag_voted' : 'tv_tag_thinking')}
+    </span>
+  )
+}
+
+function baseStatus(g: GameView, i: number): TagStatus | null {
   const over = g.phase === 'game_over'
   if (over && g.roles) {
     const r = g.roles[i]
@@ -301,6 +324,7 @@ function Travellers(props: { g: GameView; names: string[] }) {
                   {st.text}
                 </span>
               ) : null}
+              <VoteMark st={st} class="tv-tag-vote" />
             </li>
           )
         })}
