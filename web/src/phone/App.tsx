@@ -4,7 +4,7 @@ import { DEFAULT_THEME, errorText, loadTheme, onTheme, theme, ui } from '../them
 import { Connection, type ConnStatus, isTestTab, seatStore, store, tokenKey } from '../net'
 import { buzz, GameCtx, Modal } from './common'
 import { Icon } from '../icons'
-import { type Approval, ApprovedSlip } from '../approved'
+import { type CardMoment, CardSlip } from '../cardslip'
 import { JoinScreen, Lobby, RejoinScreen } from './lobby'
 import { CatchUp, GameOver, Header, OutScreen, RoleReveal, TurnArea } from './game'
 
@@ -22,8 +22,8 @@ export function PhoneApp(props: { code: string }) {
   const [discreet, setDiscreetState] = useState(store.get(DISCREET_KEY) === '1')
   const [, force] = useState(0)
   const errTimer = useRef<number>()
-  const [approval, setApproval] = useState<Approval | null>(null)
-  const approvalTimer = useRef<number>()
+  const [moment, setMoment] = useState<CardMoment | null>(null)
+  const momentTimer = useRef<number>()
 
   useEffect(() => onTheme(() => force((x) => x + 1)) as any, [])
   useEffect(() => {
@@ -39,15 +39,12 @@ export function PhoneApp(props: { code: string }) {
           if (m.t === 'state') {
             setMsg(m)
             if (m.me) setKicked(false)
-            // A vote passed: everyone gets the "planning committee approved" stamp for a moment.
-            const passed = (m.events ?? []).find((e: any) => e.type === 'vote_result' && e.passed)
-            if (passed && m.game) {
-              const r = m.room
-              const ids: string[] = r.seat_ids.length ? r.seat_ids : r.players.map((p: any) => p.id)
-              const seatNames = ids.map((id) => r.players.find((p: any) => p.id === id)?.name ?? '')
-              setApproval({ id: Date.now(), day: m.game.day, pres: seatNames[passed.president] ?? '', planner: seatNames[passed.nominee] ?? '' })
-              clearTimeout(approvalTimer.current)
-              approvalTimer.current = window.setTimeout(() => setApproval(null), 2800)
+            // A day card was played: everyone gets the card moment (stamp + one-liner) for a few seconds.
+            const played = (m.events ?? []).find((e: any) => e.type === 'enacted')
+            if (played && m.game) {
+              setMoment({ id: Date.now(), card: played.card, count: played.count, day: m.game.day })
+              clearTimeout(momentTimer.current)
+              momentTimer.current = window.setTimeout(() => setMoment(null), 3400)
             }
           } else if (m.t === 'error') {
             setError(m.code)
@@ -187,9 +184,9 @@ export function PhoneApp(props: { code: string }) {
     <GameCtx.Provider value={ctx}>
       {banner}
       {content}
-      {approval ? (
-        <div class="approved-overlay" role="status" onClick={() => setApproval(null)}>
-          <ApprovedSlip a={approval} />
+      {moment ? (
+        <div class="slip-overlay" role="status" onClick={() => setMoment(null)}>
+          <CardSlip m={moment} />
         </div>
       ) : null}
       {catchUp && g ? <CatchUp g={g} onClose={() => setCatchUp(false)} /> : null}

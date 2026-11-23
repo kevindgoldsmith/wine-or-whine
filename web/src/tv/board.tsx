@@ -5,7 +5,7 @@ import type { ComponentChildren } from 'preact'
 import type { GameEvent, GameView, RoomView } from '../types'
 import { cardName, logT, powerName, roleName, term, theme, ui } from '../theme'
 import type { Connection } from '../net'
-import { ApprovedSlip } from '../approved'
+import { CardSlip } from '../cardslip'
 import { Icon } from '../icons'
 import { NapaScene, Vine, VineRows } from '../scenery'
 import type { Beat } from './beats'
@@ -374,10 +374,10 @@ export function BeatOverlay(props: { beat: Beat; names: string[] }) {
       </div>
     )
   }
-  if (b.kind === 'approved') {
+  if (b.kind === 'card') {
     return (
-      <div class="tv-beat beat-approved" key={b.id}>
-        <ApprovedSlip a={{ id: b.id, ...b.data }} class="tv" />
+      <div class="tv-beat beat-card" key={b.id}>
+        <CardSlip m={{ id: b.id, card: b.data.card, count: b.data.count, day: b.data.day }} class="tv" />
       </div>
     )
   }

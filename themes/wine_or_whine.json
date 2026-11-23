@@ -338,9 +338,7 @@
     "more_below": "↓ {n} more",
     "you_won": "You won!",
     "you_lost": "You lost.",
-    "power_kicker": "Day {n} · your power",
-    "approved_stamp": "Approved",
-    "approved_kicker": "Day {n} · planning committee"
+    "power_kicker": "Day {n} · your power"
   },
   "hints": {
     "reveal": "Your role is secret. Overschedulers know each other; Chill Parents know nothing.",
@@ -436,18 +434,26 @@
     "stakes_B": "{n} more for the best trip ever",
     "stakes_O": "{n} more and the trip is over"
   },
-  "approved_lines": [
-    "Motion carried. Someone pack the snacks.",
-    "Nap schedules everywhere tremble.",
-    "The committee is seated. The babies have not been consulted.",
-    "Democracy, but make it rosé.",
-    "Passed by a show of sticky hands.",
-    "Congratulations. You're responsible now.",
-    "The people have spoken. The toddlers are still babbling.",
-    "Subject to one more winery.",
-    "A mandate! Or at least a majority.",
-    "Strollers at the ready.",
-    "Bold choice. The diaper bag is packed.",
-    "May your tasting notes be ever in your favour."
-  ]
+  "card_lines": {
+    "B": [
+      "Everyone napped. Even the adults.",
+      "One winery, one picnic, zero meltdowns.",
+      "Shoes optional. Schedules optional.",
+      "The babies slept in. Nobody make a sound.",
+      "Rosé by the pool. That's the whole plan.",
+      "A day so easy it's suspicious.",
+      "Somebody actually finished a book.",
+      "Nap, snack, sip, repeat."
+    ],
+    "O": [
+      "Six wineries before lunch. Bold.",
+      "The stroller has done 12,000 steps.",
+      "Nap time has been moved to 'never'.",
+      "Someone booked a sunrise balloon ride. With infants.",
+      "The itinerary now has a laminated backup.",
+      "Lunch is a granola bar in the car.",
+      "Three tastings, two blowouts, one very long drive.",
+      "Who had 'mud bath at 7am' on their bingo card?"
+    ]
+  }
 }

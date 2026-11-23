@@ -136,14 +136,14 @@ The first look read as generic. Of three proposed directions (mockups in a priva
   bottom bar, no option is half-hidden unless a long list shows a "↓ N more" hint), a mid-word split check
   and a coverage check. Long name lists scroll under a sticky confirm with that hint.
 
-## Planning committee and "Approved" moment (2026-11-23)
+## Planning committee wording and the card moment (2026-11-23)
 - Wording (Kevin): the pair up for a vote is the **planning committee**; the vote approves it. "Read someone's
   phone" is now "Read someone else's texts" everywhere (power name, log, voice, banner). Tagline: "Four couples,
   four babies, one trip to Napa."
-- When a vote passes, the TV plays an extra beat and every phone shows an overlay: a committee slip drops in,
-  an APPROVED stamp slams onto it, and a handwritten one-liner appears. Lines live in the theme
-  (`approved_lines`) so they're easy to iterate. The line is picked from the day number, so the TV and all
-  phones show the same one, and consecutive days don't repeat.
-- The phone overlay lasts about 2.8 s and taps away, so it never holds up the First One Up's card choice.
-  Discreet mode shows it plain and still; reduced-motion turns the animation off.
-- The two names are joined with "&" (it's a committee) rather than the arrow used on the boarding pass.
+- **Card moment** (Kevin: a witty line after each Breezy or Overscheduled Day, not after each vote). When a card is
+  played, the TV's card beat and an overlay on every phone show the same slip: day and count in a coloured
+  header, a BREEZY / OVERBOOKED stamp slamming on, a handwritten one-liner, and what's at stake. Lines live in
+  the theme (`card_lines.B` / `card_lines.O`), picked by the card's count so the TV and phones agree and nothing
+  repeats within a game. The TV beat no longer shows the fixed track caption (it's still on the ticket rail).
+- The phone overlay lasts about 3.4 s and taps away, so it never holds up the next turn. Discreet mode shows it
+  plain and still; reduced-motion turns the animation off. A first version fired on every passed vote; dropped.
