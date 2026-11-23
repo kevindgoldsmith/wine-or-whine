@@ -271,14 +271,14 @@ export interface TagStatus { text: string; icon?: string; kind?: string; vote?: 
 
 export function tagStatus(g: GameView, i: number): TagStatus | null {
   const st = baseStatus(g, i)
-  // The First One Up and the nominee vote too: show their vote progress alongside their role.
+  // The First One Awake and the nominee vote too: show their vote progress alongside their role.
   if (st && g.phase === 'vote' && g.alive[i] && (i === g.president || i === g.nominee)) {
     return { ...st, vote: g.voted.includes(i) ? 'voted' : 'thinking' }
   }
   return st
 }
 
-/** A vote-progress mark for a tag that also shows a role (First One Up, nominee). */
+/** A vote-progress mark for a tag that also shows a role (First One Awake, nominee). */
 export function VoteMark(props: { st: TagStatus | null; class: string }) {
   const v = props.st?.vote
   if (!v) return null

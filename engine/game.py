@@ -6,7 +6,7 @@ No I/O: ``new_game`` and ``apply`` take state (and an action) and return a new s
 Vocabulary (engine words, never shown to players):
   roles: ``chill`` (liberal), ``over`` (fascist), ``chief`` (Hitler)
   cards: ``B`` (breezy / liberal), ``O`` (overscheduled / fascist)
-  president = First One Up, chancellor = Day Planner, meter = election tracker
+  president = First One Awake, chancellor = Day Planner, meter = election tracker
   powers: ``investigate``, ``special_election``, ``peek``, ``execute``
 """
 from __future__ import annotations

@@ -107,7 +107,7 @@ mid-game and checks every client is back within 10 s (locally it takes under a s
   card_breezy card_over power veto babysitter win_chill win_over click`. Free sources: Pixabay sound effects
   (check each file's license).
 - **Lobby music:** optional `static/music/lobby.mp3`, looped on the TV lobby. The TV has a mute button.
-- **Voice announcements** ("Day 3. Sarah is up first.") are generated server-side by the configured TTS
+- **Voice announcements** ("Day 3. Sarah wakes up first.") are generated server-side by the configured TTS
   provider and cached in Postgres by text hash. With `TTS_PROVIDER=none` the TV uses the browser's built-in
   speech. The host can switch voice off in the lobby or the ⋯ menu.
 

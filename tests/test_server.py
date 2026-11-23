@@ -156,7 +156,7 @@ def test_qr_and_themes_and_spa_routes(client):
     svg = client.get(f"/api/rooms/{code}/qr.svg")
     assert svg.status_code == 200 and svg.text.lstrip().startswith("<?xml")
     assert client.get("/api/themes").json()[0]["id"] == "wine_or_whine"
-    assert client.get("/api/themes/wine_or_whine").json()["terms"]["president"] == "First One Up"
+    assert client.get("/api/themes/wine_or_whine").json()["terms"]["president"] == "First One Awake"
     assert client.get(f"/{code}").status_code == 200
     assert client.get(f"/{code}/tv").status_code == 200
     assert client.get("/toolong").status_code == 404

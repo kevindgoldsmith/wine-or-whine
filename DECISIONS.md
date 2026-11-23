@@ -190,3 +190,7 @@ The first look read as generic. Of three proposed directions (mockups in a priva
   small placeholder icon on empty tickets. A first version put the drawings on the phone's hand cards and the
   card moment slip instead; Kevin meant the board, so that was undone.
 - Babysitter duty now says players "stay back at the house" instead of "the rental" (Kevin).
+
+## "First One Awake" (2026-11-23)
+- The president role is now "First One Awake" (was "First One Up"), and the matching phrases say "wakes up
+  first" ("Day 3. Sarah wakes up first."; breakfast duty: "they'll wake up first tomorrow").

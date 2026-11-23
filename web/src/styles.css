@@ -936,7 +936,7 @@ html.discreet .slip-stakes { color: #a9a9b0; animation: none; }
 .toggle input { flex: none; }
 .tv-test-stamp { margin-top: 0.5rem; font-size: 0.75rem; white-space: normal; text-align: center; transform: rotate(-2deg); }
 .tv-ticket.filled > .stamp { margin-block: auto; align-self: center; }
-/* Vote progress on the First One Up's and nominee's tags (their role line stays) */
+/* Vote progress on the First One Awake's and nominee's tags (their role line stays) */
 .tv-tag-vote { font-size: 0.74rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; display: flex; align-items: center; gap: 0.25rem; line-height: 1.2; color: var(--muted); }
 .tv-tag-vote .icon { font-size: 0.95rem; }
 .tv-tag-vote.voted, .tag-vote.voted { color: var(--vine); }
