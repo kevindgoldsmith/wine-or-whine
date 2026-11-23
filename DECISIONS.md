@@ -162,3 +162,9 @@ The first look read as generic. Of three proposed directions (mockups in a priva
 - Once a tab is a test tab it stays one for its lifetime, even if the host switches test mode off; new tabs
   behave normally again. The trade-off for real phones in a test-mode room: closing the tab (not just
   reloading) loses the seat, and the player needs their rejoin code. Hence "Leave off for real games."
+- **iPhone QR scans in test mode** (Kevin: rescanning the TV's QR code on an iPhone didn't make a new player). iOS
+  Safari reopens the tab already showing a URL instead of opening a new one, so every scan landed on the first
+  player. In test mode the TV's QR code now carries a scan id that changes every 4 seconds; each scan is a
+  distinct link, so Safari opens a new tab. A tab that arrives with a scan id it hasn't seen also starts as a
+  new player, which covers browsers that reuse the tab anyway. The id is removed from the address bar, so a
+  reload keeps the seat. The TV shows "Test mode · each scan is a new player" under the code.

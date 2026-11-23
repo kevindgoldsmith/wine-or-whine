@@ -9,7 +9,7 @@ import '@fontsource/caveat/600.css'
 import './styles.css'
 import { Home } from './home'
 import { PhoneApp } from './phone/App'
-import { markTestTab } from './net'
+import { markTestTab, tokenKey } from './net'
 import { TvApp } from './tv/TvApp'
 
 const m = location.pathname.match(/^\/([A-Za-z]{4})(\/tv)?\/?$/)
@@ -27,7 +27,22 @@ if (m) {
     fetch(`/api/rooms/${code}`, { signal: ctl.signal })
       .then((r) => (r.ok ? r.json() : null))
       .then((info) => {
-        if (info?.test_mode) markTestTab()
+        if (info?.test_mode) {
+          markTestTab()
+          // A fresh scan of the TV's test-mode QR code means "a new player", even if the phone reused this tab.
+          const scan = new URLSearchParams(location.search).get('scan')
+          if (scan) {
+            try {
+              if (sessionStorage.getItem('wow:lastscan') !== scan) {
+                sessionStorage.removeItem(tokenKey(code))
+                sessionStorage.setItem('wow:lastscan', scan)
+              }
+            } catch {
+              /* storage blocked */
+            }
+          }
+        }
+        if (location.search.includes('scan=')) history.replaceState(null, '', `/${code}`)
       })
       .catch(() => {})
       .finally(() => {

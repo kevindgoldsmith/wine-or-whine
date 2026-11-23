@@ -135,6 +135,11 @@ def create_app(settings: Optional[Settings] = None, storage=None, tts: Optional[
         if not room:
             raise HTTPException(404, "room_missing")
         url = hub.join_url(room, str(request.base_url))
+        # Test mode: the TV asks for a fresh scan id every few seconds. A distinct URL per scan makes iOS
+        # Safari open a new tab instead of jumping back to the tab already showing the room.
+        scan = request.query_params.get("scan", "")
+        if room.test_mode and scan.isalnum() and len(scan) <= 12:
+            url = f"{url}?scan={scan}"
         buf = io.BytesIO()
         segno.make(url, error="m").save(buf, kind="svg", scale=8, dark="#2A1E24", light="#FFFFFF", border=2)
         return Response(buf.getvalue(), media_type="image/svg+xml", headers={"Cache-Control": "no-cache"})

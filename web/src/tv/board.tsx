@@ -46,6 +46,13 @@ function Postcard(props: { kicker: string; headline: string; sub?: string; child
 
 export function TvLobby(props: { room: RoomView; conn: Connection | null }) {
   const r = props.room
+  // Test mode: a new scan id every few seconds, so every scan is a distinct link (and a new player).
+  const [scanId, setScanId] = useState(() => Math.random().toString(36).slice(2, 8))
+  useEffect(() => {
+    if (!r.test_mode) return
+    const t = setInterval(() => setScanId(Math.random().toString(36).slice(2, 8)), 4000)
+    return () => clearInterval(t)
+  }, [r.test_mode])
   return (
     <section class="tv-lobby">
       <div class="tv-lobby-left">
@@ -68,8 +75,9 @@ export function TvLobby(props: { room: RoomView; conn: Connection | null }) {
       </div>
       <div class="tv-lobby-right">
         <div class="tv-qr-card">
-          <img class="tv-qr" src={`/api/rooms/${r.code}/qr.svg`} alt="" />
+          <img class="tv-qr" src={`/api/rooms/${r.code}/qr.svg${r.test_mode ? `?scan=${scanId}` : ''}`} alt="" />
           <span class="tv-qr-caption">{ui('tv_scan')}</span>
+          {r.test_mode ? <span class="stamp stamp-O tv-test-stamp">{ui('tv_test_mode')}</span> : null}
           <span class="tape tape-b" aria-hidden="true" />
         </div>
         <div class="tv-travellers lobby">

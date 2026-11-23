@@ -341,7 +341,8 @@
     "power_kicker": "Day {n} · your power",
     "host_menu_title": "Host tools",
     "lobby_test_mode": "Test mode",
-    "lobby_test_mode_hint": "Each browser tab joins as its own player, so one device can play several seats. Leave off for real games."
+    "lobby_test_mode_hint": "Each browser tab joins as its own player, so one device can play several seats. Leave off for real games.",
+    "tv_test_mode": "Test mode · each scan is a new player"
   },
   "hints": {
     "reveal": "Your role is secret. Overschedulers know each other; Chill Parents know nothing.",
