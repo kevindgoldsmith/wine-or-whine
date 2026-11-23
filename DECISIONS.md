@@ -196,3 +196,14 @@ The first look read as generic. Of three proposed directions (mockups in a priva
   first" ("Day 3. Sarah wakes up first."; breakfast duty: "they'll wake up first tomorrow").
 - The peek power is "Check the forecast" (short label "Forecast"), with a sun-and-cloud icon; "Nap check" wasn't
   intuitive (Kevin picked it from four options).
+
+## Explainer video v2 (2026-11-23)
+- Kevin's earlier explainer (174 s, 12 chapters, music bed) was rebuilt from scratch in the current look and wording:
+  luggage tags, stamps, the boarding pass, the postcard, ticket rails; First One Awake, planning committee,
+  sleeping in, Read someone else's texts, Breakfast duty, Babysitter duty at the house, Check the forecast,
+  Trip journal, and the card moment. Same chapter order; it still uses an 8-player trip as the example and
+  notes the 5–6 player differences (the Chief knows the team; Check the forecast).
+- The original's audio was a music bed (steady tempo, no pauses), so it's reused under the new narration.
+- Narration: Kevin declined an OpenAI key, so the voice is Kokoro (Apache-2.0, "af_heart"), run locally from the
+  kokoro-onnx GitHub release. Each caption window stretches to fit its line (174 s → ~184 s); the music is
+  ducked under the voice. Sources in `scripts/explainer/`; the mp4, wav and model files aren't committed.

@@ -1,0 +1,497 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Wine or Whine explainer</title>
+<style>
+@font-face { font-family: 'DM Serif Display'; src: url('../../web/node_modules/@fontsource/dm-serif-display/files/dm-serif-display-latin-400-normal.woff2') format('woff2'); font-weight: 400; }
+@font-face { font-family: 'IBM Plex Mono'; src: url('../../web/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2') format('woff2'); font-weight: 500; }
+@font-face { font-family: 'IBM Plex Mono'; src: url('../../web/node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff2') format('woff2'); font-weight: 600; }
+@font-face { font-family: 'IBM Plex Sans'; src: url('../../web/node_modules/@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2') format('woff2'); font-weight: 400; }
+@font-face { font-family: 'IBM Plex Sans'; src: url('../../web/node_modules/@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-600-normal.woff2') format('woff2'); font-weight: 600; }
+@font-face { font-family: 'Caveat'; src: url('../../web/node_modules/@fontsource/caveat/files/caveat-latin-600-normal.woff2') format('woff2'); font-weight: 600; }
+:root {
+  --kraft: #e4d3b2; --kraft-dark: #d6c098; --paper: #fbf6ea; --paper-edge: #cdb894; --ink: #1f2a44; --ink-soft: #2c3a5c;
+  --stamp: #b0302a; --vine: #2f5a3b; --vine-light: #3f6b4a; --tape: #f1e3a0; --muted: #6a6152; --rule: #cdbb98;
+  --serif: 'DM Serif Display', Georgia, serif; --mono: 'IBM Plex Mono', monospace; --sans: 'IBM Plex Sans', sans-serif; --hand: 'Caveat', cursive;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--kraft); }
+#stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; color: var(--ink); font-family: var(--sans);
+  background: radial-gradient(ellipse at 30% 20%, #ead9b9 0%, var(--kraft) 55%, #dcc7a1 100%); }
+#stage::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 46px; background:
+  radial-gradient(circle, #b9a57c 2.5px, transparent 3px) 0 0 / 16px 14px, #d9c39a; opacity: 0.9; }
+.scene { position: absolute; inset: 0; opacity: 0; }
+.icon { width: 1em; height: 1em; display: inline-block; vertical-align: -0.14em; }
+.center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.row { display: flex; align-items: center; justify-content: center; gap: 24px; }
+
+/* chapter tab and caption strip */
+.chapter { position: absolute; left: 64px; top: 52px; opacity: 0; font-family: var(--mono); font-weight: 600; font-size: 22px; letter-spacing: 0.14em;
+  text-transform: uppercase; background: var(--paper); padding: 10px 18px; border-radius: 4px; box-shadow: 0 2px 0 var(--paper-edge); }
+.chapter b { color: var(--stamp); margin-right: 10px; }
+.caption { position: absolute; left: 50%; bottom: 84px; transform: translateX(-50%); opacity: 0; max-width: 1500px; width: max-content;
+  background: var(--paper); color: var(--ink); font-size: 40px; font-weight: 600; line-height: 1.25; text-align: center; padding: 18px 34px 20px;
+  border-radius: 4px; box-shadow: 0 3px 0 var(--paper-edge), 0 18px 34px rgba(60, 40, 10, 0.18); }
+.caption::before { content: ""; position: absolute; left: 50%; top: -14px; width: 120px; height: 28px; margin-left: -60px; background: var(--tape); opacity: 0.85; transform: rotate(-2deg); }
+.note { position: absolute; font-family: var(--mono); font-size: 22px; color: var(--muted); letter-spacing: 0.04em; opacity: 0; }
+
+/* luggage tag */
+.tag { position: relative; background: var(--paper); border-radius: 6px 14px 14px 6px; padding: 18px 20px 18px 56px; min-width: 190px;
+  clip-path: polygon(22px 0, 100% 0, 100% 100%, 22px 100%, 0 calc(100% - 22px), 0 22px); box-shadow: inset 0 0 0 2px var(--rule); }
+.tag::before { content: ""; position: absolute; left: 20px; top: 50%; width: 20px; height: 20px; margin-top: -10px; border-radius: 50%;
+  background: var(--kraft); box-shadow: inset 0 0 0 4px #b8925a; }
+.tag .nm { font-family: var(--serif); font-size: 38px; line-height: 1.05; display: block; }
+.tag .st { white-space: nowrap; font-family: var(--mono); font-weight: 600; font-size: 17px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+.tag.dark { background: var(--ink); color: var(--paper); box-shadow: none; }
+.tag.dark .st { color: var(--tape); }
+.tag.grey { opacity: 0.55; }
+.tag.over { box-shadow: inset 0 0 0 3px var(--stamp); }
+.tag.over .st { color: var(--stamp); }
+.tag.chill .st { color: var(--vine); }
+.tag.big .nm { font-size: 56px; }
+.tag.big { padding: 26px 30px 26px 66px; }
+
+/* role tag */
+.role { width: 420px; height: 470px; background: var(--paper); border-radius: 10px; padding: 34px 34px 30px 34px; position: relative;
+  box-shadow: 0 4px 0 var(--paper-edge), 0 24px 40px rgba(60, 40, 10, 0.2); display: flex; flex-direction: column; gap: 14px; }
+.role .hole { position: absolute; right: 30px; top: 30px; width: 30px; height: 30px; border-radius: 50%; background: var(--kraft); box-shadow: inset 0 0 0 5px #b8925a; }
+.role .team { font-family: var(--mono); font-weight: 600; font-size: 20px; letter-spacing: 0.12em; text-transform: uppercase; display: flex; gap: 8px; align-items: center; }
+.role h3 { margin: 6px 0 0; font-family: var(--serif); font-weight: 400; font-size: 52px; line-height: 1.02; }
+.role p { margin: 0; font-size: 26px; line-height: 1.3; color: var(--muted); }
+.role .big-ic { font-size: 92px; margin-top: auto; }
+.role .count { position: absolute; right: 26px; bottom: 26px; font-family: var(--mono); font-weight: 600; font-size: 34px; }
+.role.chill .team, .role.chill .big-ic { color: var(--vine); }
+.role.over .team, .role.over .big-ic, .role.chief .team, .role.chief .big-ic { color: var(--stamp); }
+.role.chief { background: #fff8ec; box-shadow: inset 0 0 0 4px var(--stamp), 0 4px 0 var(--paper-edge), 0 24px 40px rgba(60, 40, 10, 0.2); }
+
+/* stamps */
+.stamp { display: inline-flex; align-items: center; gap: 10px; border: 6px solid currentColor; border-radius: 10px; padding: 4px 18px;
+  font-family: var(--mono); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; font-size: 40px; white-space: nowrap; background: rgba(251, 246, 234, 0.5); }
+.stamp.g { color: var(--vine-light); }
+.stamp.r { color: var(--stamp); }
+.stamp.n { color: var(--ink); }
+.stamp.sm { font-size: 22px; border-width: 4px; padding: 2px 10px; border-radius: 7px; }
+
+/* tickets (rails) */
+.rail { display: grid; gap: 14px; }
+.rail h4 { margin: 0; font-family: var(--mono); font-weight: 600; font-size: 24px; letter-spacing: 0.14em; text-transform: uppercase; display: flex; gap: 10px; align-items: center; }
+.rail.B h4 { color: var(--vine); } .rail.O h4 { color: var(--stamp); }
+.tickets { display: flex; gap: 16px; }
+.ticket { position: relative; width: 150px; height: 190px; background: #efe2c6; border-radius: 10px; overflow: hidden; box-shadow: inset 0 0 0 2px var(--rule);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ticket .bd { position: absolute; left: 8%; top: 18%; width: 84%; height: 64%; opacity: 0.16; }
+.ticket .bd svg { width: 100%; height: 100%; }
+.rail.B .bd { color: var(--vine); } .rail.O .bd { color: var(--stamp); }
+.ticket .no { position: absolute; left: 14px; bottom: 10px; font-family: var(--mono); font-size: 17px; color: var(--muted); }
+.ticket .lbl { position: absolute; left: 14px; top: 12px; font-family: var(--sans); font-weight: 600; font-size: 20px; color: var(--stamp); }
+.ticket .fill { position: absolute; inset: 0; background: var(--paper); opacity: 0; }
+.ticket .stamp { position: relative; font-size: 20px; border-width: 4px; padding: 2px 8px; opacity: 0; }
+.rail.O .ticket .stamp { font-size: 15px; padding: 2px 5px; }
+
+/* phone frame */
+.phone { width: 300px; height: 600px; border-radius: 44px; background: #181d2c; padding: 16px; box-shadow: 0 30px 60px rgba(40, 25, 5, 0.35); }
+.phone .scr { width: 100%; height: 100%; border-radius: 38px; background: var(--kraft); position: relative; overflow: hidden; padding: 60px 16px 16px; }
+.phone .scr::before { content: ""; position: absolute; top: 16px; left: 50%; width: 110px; height: 30px; margin-left: -55px; background: #181d2c; border-radius: 16px; }
+.phone .who { position: absolute; top: -56px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+.chip { white-space: nowrap; display: inline-flex; gap: 8px; align-items: center; font-family: var(--mono); font-weight: 600; font-size: 20px; letter-spacing: 0.1em; text-transform: uppercase;
+  background: var(--ink); color: var(--paper); padding: 8px 14px; border-radius: 6px; }
+.chip.paper { background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 2px var(--rule); }
+.chip.green { background: var(--vine); }
+.chip.red { background: var(--stamp); }
+.chip.tape { background: var(--tape); color: var(--ink); }
+.hand { position: absolute; left: 0; right: 0; display: flex; flex-direction: column; gap: 14px; }
+.card { position: relative; height: 104px; border-radius: 12px; background: #fffdf8; box-shadow: inset 0 0 0 2px var(--rule); padding: 14px 16px; overflow: hidden; }
+.card .k { font-family: var(--mono); font-size: 14px; letter-spacing: 0.14em; font-weight: 600; text-transform: uppercase; }
+.card .t { font-family: var(--serif); font-size: 26px; line-height: 1.1; display: block; margin-top: 4px; }
+.card.B .k, .card.B .t { color: var(--vine); } .card.O .k, .card.O .t { color: var(--stamp); }
+.card .bd { position: absolute; right: 8px; top: 8px; bottom: 8px; width: 46%; opacity: 0.16; }
+.card .bd svg { width: 100%; height: 100%; }
+.card.B .bd { color: var(--vine); } .card.O .bd { color: var(--stamp); }
+.card .stamp { position: absolute; right: 10px; bottom: 8px; font-size: 16px; border-width: 3px; padding: 1px 8px; opacity: 0; }
+
+/* card slip (card moment) */
+.slip { width: 620px; background: var(--paper); border-radius: 8px; box-shadow: 0 3px 0 var(--paper-edge), 0 30px 60px rgba(31, 42, 68, 0.35); text-align: center; padding-bottom: 28px; }
+.slip .hd { background: var(--stamp); color: var(--paper); border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; padding: 12px 24px; font-family: var(--mono); font-weight: 600; font-size: 20px; letter-spacing: 0.1em; text-transform: uppercase; }
+.slip .stamp { margin: 34px 0 18px; font-size: 64px; transform: rotate(-4deg); }
+.slip .ln { font-family: var(--hand); font-weight: 600; font-size: 54px; line-height: 1.1; }
+.slip .sk { font-family: var(--mono); font-size: 20px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-top: 16px; }
+
+.bubble { position: absolute; background: var(--paper); font-family: var(--hand); font-weight: 600; font-size: 46px; line-height: 1.05; padding: 14px 24px; border-radius: 18px;
+  box-shadow: 0 4px 0 var(--paper-edge), 0 14px 26px rgba(60, 40, 10, 0.2); opacity: 0; white-space: nowrap; }
+.tapenote { font-family: var(--hand); font-weight: 600; font-size: 44px; background: var(--tape); padding: 10px 22px; transform: rotate(-2deg); box-shadow: 0 3px 0 rgba(0, 0, 0, 0.08); }
+
+/* power tickets */
+.power { width: 330px; height: 430px; background: var(--paper); border-radius: 12px; box-shadow: 0 4px 0 var(--paper-edge), 0 20px 34px rgba(60, 40, 10, 0.16); overflow: hidden; display: flex; flex-direction: column; }
+.power .ph { background: var(--stamp); color: var(--paper); font-family: var(--mono); font-weight: 600; font-size: 17px; letter-spacing: 0.08em; text-transform: uppercase; padding: 12px 16px; }
+.power .pi { font-size: 96px; color: var(--stamp); padding: 30px 0 10px; text-align: center; }
+.power h5 { margin: 0; padding: 0 22px; font-family: var(--serif); font-weight: 400; font-size: 38px; line-height: 1.05; text-align: center; }
+.power p { margin: 12px 0 0; padding: 0 24px; font-size: 22px; line-height: 1.3; color: var(--muted); text-align: center; }
+
+/* postcard */
+.postcard { width: 1240px; background: var(--paper); padding: 22px 22px 34px; box-shadow: 0 4px 0 var(--paper-edge), 0 34px 60px rgba(60, 40, 10, 0.28); transform: rotate(-1deg); }
+.postcard .pic { height: 420px; overflow: hidden; position: relative; }
+.postcard .pic svg { width: 100%; height: 100%; display: block; }
+.postcard .greet { position: absolute; left: 22px; top: 18px; background: var(--paper); font-family: var(--serif); font-size: 30px; padding: 4px 14px; }
+.postcard .kick { font-family: var(--mono); font-weight: 600; font-size: 22px; letter-spacing: 0.16em; color: var(--stamp); text-transform: uppercase; margin: 26px 10px 0; }
+.postcard h1 { font-family: var(--serif); font-weight: 400; font-size: 140px; line-height: 1; margin: 6px 10px 0; }
+.meter { display: flex; align-items: center; gap: 30px; background: var(--paper); padding: 30px 46px; border-radius: 8px; box-shadow: 0 4px 0 var(--paper-edge); font-family: var(--mono); font-weight: 600; font-size: 36px; letter-spacing: 0.1em; text-transform: uppercase; }
+.meter .dot { width: 70px; height: 70px; border-radius: 50%; border: 5px solid #b8a98a; position: relative; }
+.meter .dot i { position: absolute; inset: 6px; border-radius: 50%; background: var(--stamp); opacity: 0; }
+.pass { width: 900px; background: var(--paper); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 0 var(--paper-edge), 0 20px 36px rgba(60, 40, 10, 0.2); }
+.pass .hd { background: var(--ink-soft); color: var(--paper); display: flex; justify-content: space-between; padding: 12px 24px; font-family: var(--mono); font-weight: 600; font-size: 20px; letter-spacing: 0.12em; text-transform: uppercase; }
+.pass .band { height: 120px; } .pass .band svg { width: 100%; height: 100%; display: block; }
+.pass .route { display: flex; justify-content: space-between; align-items: end; padding: 20px 34px 26px; }
+.pass .lab { font-family: var(--mono); font-size: 17px; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; display: block; }
+.pass .nm { font-family: var(--serif); font-size: 56px; line-height: 1; }
+.tv { width: 900px; height: 506px; background: #181d2c; border-radius: 20px; padding: 16px; box-shadow: 0 30px 60px rgba(40, 25, 5, 0.35); }
+.tv .scr { width: 100%; height: 100%; background: var(--kraft); border-radius: 8px; display: grid; grid-template-columns: 250px 1fr; gap: 20px; padding: 22px; }
+.journal { background: var(--paper); padding: 16px 18px; }
+.journal h6 { margin: 0 0 10px; font-family: var(--serif); font-weight: 400; font-size: 34px; border-bottom: 2px solid var(--ink); }
+.journal div { font-family: var(--mono); font-size: 13px; line-height: 1.5; color: var(--muted); border-bottom: 1px dashed var(--rule); padding: 5px 0; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script src="assets.js"></script>
+<script>
+const I = (n, cls = '') => `<svg class="icon ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`
+const stage = document.getElementById('stage')
+const add = (html) => { const d = document.createElement('div'); d.innerHTML = html.trim(); const el = d.firstChild; stage.appendChild(el); return el }
+const $ = (sel, root = stage) => root.querySelector(sel)
+const $$ = (sel, root = stage) => [...root.querySelectorAll(sel)]
+const used = new WeakMap()
+// Animate el from `a` to `b` starting at t seconds. The first animation on an element fills both ways; later ones
+// only fill forwards, so they never override earlier states before they start.
+function A(el, a, b, t, d = 0.6, easing = 'cubic-bezier(.2,.8,.3,1)') {
+  if (!el) throw new Error('missing element at ' + t)
+  const first = !used.get(el); used.set(el, true)
+  el.animate([a, b], { delay: t * 1000, duration: d * 1000, fill: first ? 'both' : 'forwards', easing })
+}
+const show = (el, t0, t1, d = 0.5) => { A(el, { opacity: 0 }, { opacity: 1 }, t0, d); if (t1 !== undefined) A(el, { opacity: 1 }, { opacity: 0 }, t1 - d, d) }
+const pop = (el, t, d = 0.5, from = 'scale(0.6)', to = 'scale(1)') => A(el, { opacity: 0, transform: from }, { opacity: 1, transform: to }, t, d, 'cubic-bezier(.2,1.4,.4,1)')
+const slam = (el, t, rot = -6) => A(el, { opacity: 0, transform: `scale(2.2) rotate(${rot - 10}deg)` }, { opacity: 1, transform: `scale(1) rotate(${rot}deg)` }, t, 0.32, 'cubic-bezier(.3,1.5,.5,1)')
+const dim = (el, t, to = 0.3) => A(el, { opacity: 1 }, { opacity: to }, t, 0.4)
+const undim = (el, t, from = 0.3) => A(el, { opacity: from }, { opacity: 1 }, t, 0.4)
+const scene = (t0, t1) => { const s = add('<div class="scene"></div>'); show(s, t0, t1); return s }
+const into = (s, html) => { const d = document.createElement('div'); d.innerHTML = html.trim(); const el = d.firstChild; s.appendChild(el); return el }
+
+// ---------------------------------------------------------------- chapters and captions
+const CH = [
+  [6, 21, 1, 'The teams'], [21, 33, 2, 'Who knows what'], [33, 48, 3, 'How to win'], [48, 57, 4, 'Each round is a day'],
+  [57, 69, 5, 'Pick a Day Planner'], [69, 81, 6, 'The vote'], [81, 93, 7, 'Indecision meter'], [93, 111, 8, 'The silent handoff'],
+  [111, 121, 9, 'The deck'], [121, 146, 10, 'Powers'], [146, 156, 11, 'Watch the Chief'], [156, 165, 12, 'Phones and the TV'],
+]
+const CAP = [
+  [6.6, 10, 'Everyone gets a secret role on their phone.'],
+  [10, 15, 'Most of you are Chill Parents. You just want a breezy trip.'],
+  [15, 20.6, 'But two Overschedulers and their boss, the Chief Overscheduler, want chaos.'],
+  [21.4, 27, 'Overschedulers know each other, and they know who the Chief is.'],
+  [27, 32.6, "The Chief doesn't know their teammates. Chill Parents know nothing at all."],
+  [33.4, 38, 'Every day, one card gets played: a Breezy Day or an Overscheduled Day.'],
+  [38, 43.5, 'Chill Parents win with 5 Breezy Days. Overschedulers win with 6 Overscheduled Days.'],
+  [43.5, 47.6, 'Every card played is stamped on the board for everyone to see.'],
+  [48.4, 53, 'Each round is a new day. Someone is the First One Awake.'],
+  [53, 56.6, 'The job passes to the next person around the table every day.'],
+  [57.4, 62, 'The First One Awake picks someone to be the Day Planner.'],
+  [62, 68.6, "Whoever planned the last day sits this one out. They're sleeping in."],
+  [69.4, 73, "Together they're today's planning committee. Everyone votes on it at once."],
+  [73, 77, 'The stamps flip together. A majority of YES approves the committee.'],
+  [77, 80.6, 'A tie, or a majority of NO, means the vote fails.'],
+  [81.4, 85, 'Every failed vote moves the indecision meter up one.'],
+  [85, 90, 'Three in a row and the babies decide: the top card is played automatically.'],
+  [90, 92.6, 'Then the meter resets.'],
+  [93.4, 98, 'If the vote passes, the First One Awake secretly draws three cards.'],
+  [98, 102, 'They bin one and pass the other two to the Day Planner.'],
+  [102, 106, 'The Day Planner plays one. No talking: the babies are asleep.'],
+  [106, 110.6, "Then anyone can claim anything. That's where the lying starts."],
+  [111.4, 116, 'The deck has 6 Breezy Days and 11 Overscheduled Days.'],
+  [116, 120.6, "So even honest players get bad hands, and nobody can prove who's lying."],
+  [121.4, 126, 'Overscheduled Days unlock powers for the First One Awake.'],
+  [126, 131, "Read someone else's texts: secretly see one player's team."],
+  [131, 136, 'Breakfast duty: choose who wakes up first tomorrow.'],
+  [136, 141, 'Babysitter duty: that player stays back at the house and is out.'],
+  [141, 145.6, 'After the fifth, the planning committee can agree to veto a bad hand.'],
+  [146.4, 150, 'Careful: after 3 Overscheduled Days, if the Chief becomes Day Planner…'],
+  [150, 153, '…the Overschedulers win instantly.'],
+  [153, 155.6, 'But put the Chief on babysitter duty, and the Chill Parents win.'],
+  [156.4, 160.5, 'Your phone is private: your role, your cards, your turn.'],
+  [160.5, 164.6, 'The TV shows the board everyone can see. Keep your phone to yourself.'],
+]
+for (const [t0, t1, n, label] of CH) show(add(`<div class="chapter"><b>${String(n).padStart(2, '0')}</b>${label}</div>`), t0 + 0.2, t1 - 0.1)
+for (const [t0, t1, text] of CAP) show(add(`<div class="caption">${text}</div>`), t0, t1, 0.35)
+
+const NAMES = ['Sam', 'Priya', 'Jordan', 'Mia', 'Theo', 'Alex', 'Rosa', 'Kenji']
+const bd = (k) => `<span class="bd" style="color:${k === 'B' ? '#2f5a3b' : '#b0302a'}">${k === 'B' ? SVGS.bdB : SVGS.bdO}</span>`
+
+// ---------------------------------------------------------------- 0 title
+{
+  const s = scene(0, 6.2)
+  const pc = into(s, `<div class="center" style="top:47%"><div class="postcard">
+    <div class="pic">${SVGS.napa}<span class="greet">Greetings from Napa Valley</span></div>
+    <div class="kick">How to play · Four couples, four babies, one trip to Napa</div>
+    <h1>Wine or Whine</h1>
+    <div class="row" style="justify-content:flex-start;gap:14px;margin:20px 10px 0" id="chips">
+      <span class="chip paper">5–10 players</span><span class="chip paper">About 45 minutes</span><span class="chip paper">One phone each</span></div>
+  </div></div>`)
+  A(pc.firstChild, { transform: 'translateY(40px) rotate(-3deg)', opacity: 0 }, { transform: 'translateY(0) rotate(-1deg)', opacity: 1 }, 0.1, 0.9)
+  $$('#chips .chip', s).forEach((c, i) => pop(c, 1.6 + i * 0.25))
+}
+
+// ---------------------------------------------------------------- 1 the teams
+{
+  const s = scene(6, 21)
+  const roles = into(s, `<div class="center row" style="top:46%;gap:44px">
+    <div class="role chill"><span class="hole"></span><div class="team">${I('chill')} Chill Parents</div><h3>Chill Parent</h3><p>Wants a breezy trip.</p><div class="big-ic">${I('breezy')}</div><div class="count">×5</div></div>
+    <div class="role over"><span class="hole"></span><div class="team">${I('over_team')} Overschedulers</div><h3>Over&shy;scheduler</h3><p>Wants one more stop.</p><div class="big-ic">${I('over')}</div><div class="count">×2</div></div>
+    <div class="role chief"><span class="hole"></span><div class="team">${I('chief')} Overschedulers</div><h3>Chief Over&shy;scheduler</h3><p>Secretly runs the show.</p><div class="big-ic">${I('chief')}</div><div class="count">×1</div></div>
+  </div>`)
+  const [c, o, k] = [...roles.children]
+  ;[c, o, k].forEach((el, i) => pop(el, 6.6 + i * 0.35, 0.6, 'translateY(60px) rotate(4deg) scale(0.9)', `translateY(0) rotate(${[-2, 1, -1][i]}deg) scale(1)`))
+  show(into(s, `<div class="note" style="right:70px;top:62px">Shown: an 8-player trip</div>`), 7.5, 20.6)
+  dim(o, 10.2); dim(k, 10.2)
+  undim(o, 15.2); undim(k, 15.2); dim(c, 15.2)
+}
+
+// ---------------------------------------------------------------- 2 who knows what
+{
+  const s = scene(21, 33)
+  const roleOf = ['chill', 'chill', 'chill', 'chill', 'chill', 'over', 'over', 'chief']
+  const row = into(s, `<div class="center row" style="top:58%;gap:20px">${NAMES.map((n, i) => `<div class="tag ${roleOf[i] === 'chill' ? 'chill' : 'over'}" style="min-width:196px"><span class="nm">${n}</span><span class="st">${roleOf[i] === 'chill' ? I('chill') + 'Chill' : roleOf[i] === 'chief' ? I('chief') + 'Chief' : I('over_team') + 'Over'}</span></div>`).join('')}</div>`)
+  ;[...row.children].forEach((t, i) => pop(t, 21.3 + i * 0.12, 0.45, 'translateY(30px)', 'translateY(0)'))
+  // links: Alex, Rosa -> Kenji, Alex <-> Rosa
+  const W = 216, x0 = 960 - 3.5 * W
+  const cx = (i) => x0 + i * W
+  const links = into(s, `<svg style="position:absolute;inset:0;width:1920px;height:1080px" viewBox="0 0 1920 1080" fill="none" stroke="#b0302a" stroke-width="6" stroke-linecap="round">
+    <path id="l1" d="M${cx(5)} 520 C ${cx(5) + 40} 400, ${cx(7) - 40} 400, ${cx(7)} 520" stroke-dasharray="600" stroke-dashoffset="600"/>
+    <path id="l2" d="M${cx(6)} 520 C ${cx(6) + 20} 450, ${cx(7) - 20} 450, ${cx(7)} 520" stroke-dasharray="400" stroke-dashoffset="400"/>
+    <path id="l3" d="M${cx(5)} 520 C ${cx(5) + 20} 455, ${cx(6) - 20} 455, ${cx(6)} 520" stroke-dasharray="400" stroke-dashoffset="400"/></svg>`)
+  A($('#l1', links), { strokeDashoffset: 600 }, { strokeDashoffset: 0 }, 22.4, 1.1)
+  A($('#l3', links), { strokeDashoffset: 400 }, { strokeDashoffset: 0 }, 22.9, 0.9)
+  A($('#l2', links), { strokeDashoffset: 400 }, { strokeDashoffset: 0 }, 23.3, 0.9)
+  const eyes = into(s, `<div style="position:absolute;left:${cx(6) - 60}px;top:300px;font-size:72px;color:var(--stamp)">${I('investigate')}</div>`)
+  pop(eyes, 23.6)
+  // question marks over Chill Parents and the Chief (they don't know)
+  ;[0, 1, 2, 3, 4, 7].forEach((i, k) => {
+    const q = into(s, `<div style="position:absolute;left:${cx(i) - 24}px;top:${i === 7 ? 330 : 420}px;width:48px;height:48px;border-radius:50%;background:var(--ink);color:var(--paper);font-family:var(--serif);font-size:36px;display:flex;align-items:center;justify-content:center">?</div>`)
+    pop(q, 27.3 + k * 0.12)
+  })
+  show(into(s, `<div class="note" style="left:50%;transform:translateX(-50%);top:700px">In 5–6 player trips, the Chief knows the team too.</div>`), 28.5, 32.6)
+}
+
+// ---------------------------------------------------------------- 3 how to win
+{
+  const s = scene(33, 48)
+  const tk = (k, n, lab) => `<div class="ticket">${bd(k)}<div class="fill"></div>${lab ? `<span class="lbl" style="color:${k === 'B' ? 'var(--vine)' : 'var(--stamp)'}">${lab}</span>` : ''}<span class="stamp ${k === 'B' ? 'g' : 'r'}">${k === 'B' ? 'Breezy' : 'Overbooked'}</span><span class="no">${String(n).padStart(2, '0')}</span></div>`
+  const b = into(s, `<div class="center" style="top:44%;display:grid;gap:40px">
+    <div class="rail B"><h4>${I('breezy')} Breezy Days · 5 to win</h4><div class="tickets">${[1, 2, 3, 4, 5].map((n) => tk('B', n, n === 5 ? 'Win' : '')).join('')}</div></div>
+    <div class="rail O"><h4>${I('over')} Overscheduled Days · 6 to lose</h4><div class="tickets">${[1, 2, 3, 4, 5, 6].map((n) => tk('O', n, n === 6 ? 'Lose' : '')).join('')}</div></div></div>`)
+  A(b, { opacity: 0, transform: 'translate(-50%, -46%)' }, { opacity: 1, transform: 'translate(-50%, -50%)' }, 33.3, 0.7)
+  const tB = $$('.rail.B .ticket', b), tO = $$('.rail.O .ticket', b)
+  const stampIt = (t, at) => { show($('.fill', t), at, undefined, 0.2); slam($('.stamp', t), at, [-8, 5, -4, 7, -6, 4][Math.floor(at * 7) % 6]) }
+  stampIt(tB[0], 35.2); stampIt(tO[0], 36.4)
+  tB.slice(1).forEach((t, i) => stampIt(t, 38.6 + i * 0.45))
+  tO.slice(1).forEach((t, i) => stampIt(t, 40.8 + i * 0.4))
+}
+
+// ---------------------------------------------------------------- 4 each round is a day
+{
+  const s = scene(48, 57)
+  const sun = into(s, `<div style="position:absolute;left:50%;top:150px;margin-left:-110px;width:220px;height:220px;color:#E9A23B;font-size:220px">${I('president')}</div>`)
+  A(sun, { opacity: 0, transform: 'translateY(120px) rotate(-30deg)' }, { opacity: 1, transform: 'translateY(0) rotate(0deg)' }, 48.2, 1.3)
+  const W = 216, x0 = 960 - 3.5 * W
+  const row = into(s, `<div class="center row" style="top:62%;gap:20px">${NAMES.map((n) => `<div class="tag" style="min-width:196px"><span class="nm">${n}</span><span class="st">&nbsp;</span></div>`).join('')}</div>`)
+  ;[...row.children].forEach((t, i) => pop(t, 48.6 + i * 0.08, 0.4, 'translateY(30px)', 'translateY(0)'))
+  const badge = into(s, `<div style="position:absolute;left:${x0}px;top:520px;width:0"><div class="chip tape" style="position:absolute;left:0;top:0;transform:translateX(-50%)">${I('president')} First One Awake</div></div>`)
+  pop(badge, 49.6)
+  A(badge, { transform: 'translateX(0)' }, { transform: `translateX(${W}px)` }, 53.6, 0.7, 'cubic-bezier(.5,0,.3,1)')
+  A(badge, { transform: `translateX(${W}px)` }, { transform: `translateX(${2 * W}px)` }, 55.3, 0.7, 'cubic-bezier(.5,0,.3,1)')
+}
+
+// ---------------------------------------------------------------- 5 pick a day planner
+{
+  const s = scene(57, 69)
+  const g = into(s, `<div class="center row" style="top:46%;gap:70px">
+    <div class="tag dark big"><span class="nm">Priya</span><span class="st">${I('president')} First One Awake</span></div>
+    <svg width="220" height="60" viewBox="0 0 220 60" fill="none" stroke="#1f2a44" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path id="arr" d="M8 30 H 200 M176 10 L 204 30 L 176 50" stroke-dasharray="300" stroke-dashoffset="300"/></svg>
+    <div class="tag big" style="box-shadow:inset 0 0 0 4px var(--ink)"><span class="nm">Mia</span><span class="st">${I('chancellor')} Day Planner?</span></div>
+    <div class="tag big grey"><span class="nm">Jordan</span><span class="st">${I('sleeping')} Sleeping in</span></div>
+  </div>`)
+  const [p, arr, m, j] = [...g.children]
+  pop(p, 57.4); A($('#arr', g), { strokeDashoffset: 300 }, { strokeDashoffset: 0 }, 58.6, 0.7); pop(m, 59.3)
+  A(j, { opacity: 0, transform: 'translateY(30px)' }, { opacity: 0.55, transform: 'translateY(0)' }, 62.4, 0.6)
+  show(into(s, `<div class="note" style="left:50%;transform:translateX(-50%);top:690px">Jordan was yesterday's Day Planner.</div>`), 63.2, 68.6)
+}
+
+// ---------------------------------------------------------------- 6 the vote
+{
+  const s = scene(69, 81)
+  const pass = into(s, `<div style="position:absolute;left:50%;top:120px;margin-left:-450px"><div class="pass"><div class="hd"><span>Proposed planning committee</span><span>Day 4</span></div>
+    <div class="band">${SVGS.band}</div>
+    <div class="route"><div><span class="lab">First One Awake</span><span class="nm">Priya</span></div><span style="font-size:48px">${I('arrow')}</span><div style="text-align:right"><span class="lab">Day Planner</span><span class="nm">Mia</span></div></div></div></div>`)
+  pop(pass, 69.4, 0.6, 'translateY(-40px) scale(0.95)', 'translateY(0) scale(1)')
+  const votes = [1, 1, 0, 1, 0, 1, 1, 0]
+  const row = into(s, `<div style="position:absolute;left:0;right:0;top:520px" class="row">${NAMES.map((n, i) => `<div style="display:flex;flex-direction:column;align-items:center;gap:14px;width:190px">
+    <div style="position:relative;width:150px;height:120px">
+      <div class="qc" style="position:absolute;inset:0;background:var(--ink);color:var(--paper);border-radius:10px;font-family:var(--serif);font-size:70px;display:flex;align-items:center;justify-content:center">?</div>
+      <div class="vs" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><span class="stamp ${votes[i] ? 'g' : 'r'}" style="font-size:30px">${votes[i] ? I('yes') + 'Yes' : I('no') + 'No'}</span></div></div>
+    <span style="font-family:var(--serif);font-size:34px">${n}</span></div>`).join('')}</div>`)
+  ;[...row.children].forEach((c, i) => { pop(c, 70.2 + i * 0.1, 0.4, 'translateY(30px)', 'translateY(0)'); A($('.qc', c), { opacity: 1 }, { opacity: 0 }, 73.4 + i * 0.06, 0.2); slam($('.vs .stamp', c), 73.45 + i * 0.06, [-6, 4, -3, 5, -5, 3, -4, 6][i]) })
+  const res = into(s, `<div style="position:absolute;left:50%;top:770px;transform:translateX(-50%)"><span class="stamp g" style="font-size:44px">Approved 5–3</span></div>`)
+  slam(res.firstChild, 74.8, -3)
+  const fail = into(s, `<div style="position:absolute;left:1260px;top:780px"><span class="stamp r sm" style="font-size:26px">Tie or more No · Fails</span></div>`)
+  slam(fail.firstChild, 77.6, 4)
+}
+
+// ---------------------------------------------------------------- 7 indecision meter
+{
+  const s = scene(81, 93)
+  const m = into(s, `<div class="center" style="top:36%"><div class="meter">Indecision meter<span class="dot"><i></i></span><span class="dot"><i></i></span><span class="dot"><i></i></span></div></div>`)
+  pop(m.firstChild, 81.4, 0.5, 'scale(0.9)', 'scale(1)')
+  const dots = $$('.dot i', m)
+  pop(dots[0], 82.6); pop(dots[1], 84.4); pop(dots[2], 85.6)
+  dots.forEach((d) => A(d, { opacity: 1 }, { opacity: 0 }, 90.3, 0.4))
+  const babies = into(s, `<div style="position:absolute;left:50%;top:560px;transform:translateX(-50%);display:flex;align-items:center;gap:60px">
+    <div class="tapenote">The babies decided!</div>
+    <div class="ticket" style="width:170px;height:210px;background:var(--paper)">${bd('O')}<span class="stamp r" style="opacity:1;font-size:24px;transform:rotate(-6deg)">Overbooked</span></div></div>`)
+  pop(babies.firstElementChild, 86.4, 0.5, 'rotate(-8deg) scale(0.8)', 'rotate(-2deg) scale(1)')
+  A(babies.lastElementChild, { opacity: 0, transform: 'translateY(-80px) rotate(-14deg)' }, { opacity: 1, transform: 'translateY(0) rotate(3deg)' }, 87.2, 0.6)
+  const reset = into(s, `<div style="position:absolute;left:50%;top:470px;transform:translateX(-50%)"><span class="chip">Meter resets</span></div>`)
+  pop(reset.firstChild, 90.6)
+}
+
+// ---------------------------------------------------------------- 8 the silent handoff
+{
+  const s = scene(93, 111)
+  const L = 470, R = 1150
+  const ph = (x, who, chip) => into(s, `<div style="position:absolute;left:${x}px;top:210px"><div class="phone"><div class="scr"></div></div><div class="who" style="left:${150}px"><span class="chip ${chip}">${who}</span></div></div>`)
+  const pl = ph(L, `${I('president')} First One Awake`, 'tape'), pr = ph(R, `${I('chancellor')} Day Planner`, 'paper')
+  ;[pl, pr].forEach((p, i) => pop(p, 93.4 + i * 0.25, 0.6, 'translateY(60px)', 'translateY(0)'))
+  $$('.who', stage).forEach((w) => { w.style.position = 'absolute'; w.style.top = '-60px'; w.style.transform = 'translateX(-50%)' })
+  const shh = into(s, `<div style="position:absolute;left:822px;top:640px;transform:rotate(-3deg)"><div class="tapenote" style="font-size:40px">Shh — no talking<br>till it's played.</div></div>`)
+  pop(shh, 94.6)
+  const card = (k, extra = '') => `<div class="card ${k}" ${extra}>${bd(k)}<span class="k">Day card</span><span class="t">${k === 'B' ? 'Breezy Day' : 'Overscheduled Day'}</span><span class="stamp ${k === 'B' ? 'g' : 'r'}">${k === 'B' ? 'Binned' : 'Played'}</span></div>`
+  // Three cards drawn on the left phone (absolute in stage so they can travel between phones)
+  const cx0 = L + 16 + 16, cw = 300 - 32 - 32
+  const cards = ['B', 'O', 'O'].map((k, i) => into(s, `<div style="position:absolute;left:${cx0}px;top:${300 + i * 118}px;width:${cw}px">${card(k)}</div>`))
+  cards.forEach((c, i) => pop(c, 94.2 + i * 0.3, 0.45, 'translateY(-30px)', 'translateY(0)'))
+  // bin the Breezy (the First One Awake keeps quiet about it)
+  slam($('.stamp', cards[0]), 98.6, -6)
+  A(cards[0], { opacity: 1, transform: 'translateY(0)' }, { opacity: 0, transform: 'translateY(80px) rotate(-8deg)' }, 99.6, 0.6)
+  // pass the other two to the Day Planner
+  cards.slice(1).forEach((c, i) => A(c, { transform: 'translate(0, 0)' }, { transform: `translate(${R - L}px, ${-118}px)` }, 100.4 + i * 0.2, 0.9, 'cubic-bezier(.5,0,.25,1)'))
+  // the Day Planner plays one
+  const playedStamp = $('.stamp', cards[1]); slam(playedStamp, 102.8, -6)
+  A(cards[2], { opacity: 1 }, { opacity: 0.35 }, 103.4, 0.4)
+  // card moment
+  const slip = into(s, `<div style="position:absolute;left:50%;top:200px;margin-left:-310px"><div class="slip"><div class="hd"><span>Day 4</span><span>Overscheduled Day 2 of 6</span></div>
+    <span class="stamp r">Overbooked</span><div class="ln">Six wineries before lunch. Bold.</div><div class="sk">4 more and the trip is over</div></div></div>`)
+  pop(slip, 104.2, 0.45, 'translateY(-50px) rotate(-3deg)', 'translateY(0) rotate(-1deg)')
+  slam($('.stamp', slip), 104.6, -4)
+  A(slip, { opacity: 1 }, { opacity: 0 }, 106.4, 0.4)
+  const b1 = into(s, `<div class="bubble" style="left:${L - 380}px;top:260px;transform:rotate(-3deg)">I gave you a Breezy!</div>`)
+  const b2 = into(s, `<div class="bubble" style="left:${R + 250}px;top:230px;transform:rotate(2deg)">You gave me two<br>Overscheduled!</div>`)
+  pop(b1, 107, 0.4, 'scale(0.7) rotate(-3deg)', 'scale(1) rotate(-3deg)'); pop(b2, 108, 0.4, 'scale(0.7) rotate(2deg)', 'scale(1) rotate(2deg)')
+}
+
+// ---------------------------------------------------------------- 9 the deck
+{
+  const s = scene(111, 121)
+  const fan = (k, n, x) => {
+    const g = into(s, `<div style="position:absolute;left:${x}px;top:330px;width:10px;height:10px"></div>`)
+    for (let i = 0; i < n; i++) {
+      const a = (i - (n - 1) / 2) * (k === 'B' ? 7 : 4.6)
+      const c = into(g, `<div class="ticket" style="position:absolute;left:-85px;top:0;width:170px;height:220px;background:var(--paper);transform-origin:50% 140%;box-shadow:inset 0 0 0 2px var(--rule),0 6px 12px rgba(0,0,0,.12)">${bd(k)}<span class="stamp ${k === 'B' ? 'g' : 'r'}" style="opacity:1;font-size:20px">${k === 'B' ? 'Breezy' : 'Overbooked'}</span></div>`)
+      A(c, { opacity: 0, transform: 'rotate(0deg) translateY(40px)' }, { opacity: 1, transform: `rotate(${a}deg) translateY(0)` }, 111.4 + i * 0.06, 0.6)
+    }
+    return g
+  }
+  fan('B', 6, 640); fan('O', 11, 1280)
+  const lb = into(s, `<div style="position:absolute;left:640px;top:640px;transform:translateX(-50%)"><span class="stamp g" style="font-size:42px">6 Breezy</span></div>`)
+  const lo = into(s, `<div style="position:absolute;left:1280px;top:640px;transform:translateX(-50%)"><span class="stamp r" style="font-size:42px">11 Overscheduled</span></div>`)
+  slam(lb.firstChild, 112.6, -4); slam(lo.firstChild, 113.1, 3)
+}
+
+// ---------------------------------------------------------------- 10 powers
+{
+  const s = scene(121, 146)
+  const P = [
+    ['After 2nd Overscheduled', 'investigate', "Read someone else's texts", "Secretly see one player's team."],
+    ['After 3rd Overscheduled', 'special_election', 'Breakfast duty', 'Choose who wakes up first tomorrow.'],
+    ['After 4th & 5th', 'execute', 'Babysitter duty', "That player stays back at the house. They're out."],
+    ['After 5th Overscheduled', 'veto', 'Veto', 'The planning committee can agree to toss the hand.'],
+  ]
+  const row = into(s, `<div class="center row" style="top:46%;gap:30px">${P.map(([h, ic, t, d]) => `<div class="power"><div class="ph">${h}</div><div class="pi">${I(ic)}</div><h5>${t}</h5><p>${d}</p></div>`).join('')}</div>`)
+  const cards = [...row.children]
+  cards.forEach((c, i) => pop(c, 121.6 + i * 0.2, 0.5, 'translateY(50px)', 'translateY(0)'))
+  cards.forEach((c, i) => {
+    const on = 126 + i * 5
+    if (i > 0) dim(c, 123.8, 0.35)
+    if (i > 0) A(c, { opacity: 0.35, transform: 'translateY(0)' }, { opacity: 1, transform: 'translateY(-18px)' }, on, 0.4)
+    else { dim(c, 123.8, 0.35); A(c, { opacity: 0.35, transform: 'translateY(0)' }, { opacity: 1, transform: 'translateY(-18px)' }, on, 0.4) }
+    if (i < 3) A(c, { opacity: 1, transform: 'translateY(-18px)' }, { opacity: 0.35, transform: 'translateY(0)' }, on + 4.8, 0.4)
+  })
+  show(into(s, `<div class="note" style="left:50%;transform:translateX(-50%);top:792px">${I('peek')} Smaller trips (5–6 players) get Check the forecast: a secret look at the next 3 days.</div>`), 124, 145.6)
+}
+
+// ---------------------------------------------------------------- 11 watch the chief
+{
+  const s = scene(146, 156)
+  const k = into(s, `<div style="position:absolute;left:330px;top:210px"><div class="role chief" style="transform:rotate(-2deg)"><span class="hole"></span><div class="team">${I('chief')} Overschedulers</div><h3>Chief Over&shy;scheduler</h3><p>Secretly runs the show.</p><div class="big-ic">${I('chief')}</div></div></div>`)
+  pop(k, 146.4, 0.6, 'translateY(40px)', 'translateY(0)')
+  const c1 = into(s, `<div style="position:absolute;left:420px;top:720px"><span class="chip">${I('chancellor')} Day Planner</span></div>`)
+  const c2 = into(s, `<div style="position:absolute;left:420px;top:720px"><span class="chip red">${I('execute')} Babysitter duty</span></div>`)
+  pop(c1, 147.4); A(c1, { opacity: 1 }, { opacity: 0 }, 152.8, 0.3); pop(c2, 153.2)
+  const w1 = into(s, `<div style="position:absolute;left:960px;top:330px"><span class="stamp r" style="font-size:38px">Meltdown · Overschedulers win</span></div>`)
+  const w2 = into(s, `<div style="position:absolute;left:960px;top:500px"><span class="stamp g" style="font-size:38px">Best trip ever · Chill Parents win</span></div>`)
+  slam(w1.firstChild, 150.3, -4); A(w1, { opacity: 1 }, { opacity: 0.35 }, 153.1, 0.4); slam(w2.firstChild, 153.5, 3)
+  w2.style.left = '820px'; w1.style.left = '820px'
+}
+
+// ---------------------------------------------------------------- 12 phones and the TV
+{
+  const s = scene(156, 165)
+  const ph = into(s, `<div style="position:absolute;left:360px;top:220px"><div class="phone"><div class="scr" style="padding-top:80px">
+    <div style="font-family:var(--serif);font-size:30px;text-align:center;margin-bottom:20px">Your secret role</div>
+    <div style="position:relative;height:280px">
+      <div class="cover" style="position:absolute;inset:0;background:var(--ink);color:var(--paper);border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--mono);font-weight:600;font-size:20px;letter-spacing:.08em;padding:20px">PRESS AND HOLD<br>TO READ YOUR TAG</div>
+      <div class="rv" style="position:absolute;inset:0;background:var(--paper);border-radius:12px;padding:18px;box-shadow:inset 0 0 0 3px var(--stamp)">
+        <div class="team" style="font-family:var(--mono);font-weight:600;font-size:16px;letter-spacing:.12em;color:var(--stamp)">${I('over_team')} OVERSCHEDULERS</div>
+        <div style="font-family:var(--serif);font-size:30px;line-height:1.05;margin-top:10px">You're an Over&shy;scheduler</div>
+        <div style="font-size:18px;color:var(--muted);margin-top:8px">Your fellow Overscheduler: Rosa. The Chief is Kenji.</div></div></div>
+  </div></div><div style="position:absolute;left:150px;top:-60px;transform:translateX(-50%)"><span class="chip">${I('veto')} Private</span></div></div>`)
+  pop(ph, 156.4, 0.6, 'translateY(60px)', 'translateY(0)')
+  A($('.rv', ph), { opacity: 0 }, { opacity: 1 }, 157.6, 0.25); A($('.rv', ph), { opacity: 1 }, { opacity: 0 }, 159.8, 0.25)
+  const finger = into(s, `<div style="position:absolute;left:480px;top:480px;width:90px;height:90px;border-radius:50%;background:rgba(31,42,68,.25);border:4px solid rgba(255,255,255,.7)"></div>`)
+  show(finger, 157.2, 160.1, 0.25)
+  const tv = into(s, `<div style="position:absolute;left:820px;top:260px"><div class="tv"><div class="scr">
+    <div class="journal"><h6>Trip journal</h6><div>DAY 1 Sam picked Priya. Passed 6–2. Breezy.</div><div>DAY 2 Priya picked Theo. Failed 3–5.</div><div>DAY 3 Jordan picked Mia. Passed 5–3. Overscheduled.</div><div>DAY 4 Mia is up…</div></div>
+    <div style="display:grid;gap:16px;align-content:center">
+      <div class="rail B" style="gap:8px"><h4 style="font-size:15px">${I('breezy')} Breezy · 5 to win</h4><div class="tickets" style="gap:8px">${[1, 2, 3, 4, 5].map((n) => `<div class="ticket" style="width:80px;height:100px;${n === 1 ? 'background:var(--paper)' : ''}">${bd('B')}${n === 1 ? '<span class="stamp g" style="opacity:1;font-size:12px;border-width:3px">Breezy</span>' : ''}</div>`).join('')}</div></div>
+      <div class="rail O" style="gap:8px"><h4 style="font-size:15px">${I('over')} Overscheduled · 6 to lose</h4><div class="tickets" style="gap:8px">${[1, 2, 3, 4, 5, 6].map((n) => `<div class="ticket" style="width:66px;height:100px;${n === 1 ? 'background:var(--paper)' : ''}">${bd('O')}${n === 1 ? '<span class="stamp r" style="opacity:1;font-size:10px;border-width:3px;padding:1px 4px">Overbooked</span>' : ''}</div>`).join('')}</div></div>
+    </div></div></div><div style="position:absolute;left:450px;top:-60px;transform:translateX(-50%)"><span class="chip green">Everyone</span></div></div>`)
+  pop(tv, 160.6, 0.6, 'translateY(60px)', 'translateY(0)')
+}
+
+// ---------------------------------------------------------------- ready
+{
+  const s = scene(165, 174.5)
+  const pc = into(s, `<div class="center" style="top:46%"><div class="postcard" style="width:1180px;text-align:center">
+    <div class="pic" style="height:330px">${SVGS.napa}</div>
+    <h1 style="font-size:150px;margin-top:20px">Ready?</h1>
+    <div style="font-family:var(--hand);font-weight:600;font-size:56px;margin-top:4px">Let's find out who really wants one more winery.</div>
+    <div style="margin-top:26px"><span class="chip" style="font-size:26px;padding:14px 26px">Scan the code on the TV to join</span></div></div></div>`)
+  A(pc.firstChild, { transform: 'translateY(40px) rotate(2deg)', opacity: 0 }, { transform: 'translateY(0) rotate(-1deg)', opacity: 1 }, 165.2, 0.9)
+  show(into(s, `<div class="note" style="left:50%;transform:translateX(-50%);bottom:60px;font-size:18px;color:#4e4130">Adapted from Secret Hitler by Goat, Wolf &amp; Cabbage · CC BY-NC-SA 4.0</div>`), 166, 174.5)
+}
+
+// Pause everything; the recorder sets the time.
+document.getAnimations().forEach((a) => a.pause())
+const TMAP = [[0.0, 0.0], [0.8, 0.8], [6.0, 6.0], [6.6, 6.6], [10.0, 10.0], [15.0, 15.0], [20.6, 20.6], [21.4, 21.4], [27.0, 27.0], [32.6, 32.6], [33.4, 33.4], [38.0, 38.68633333333333], [43.5, 45.096624999999996], [47.6, 49.196625], [48.4, 49.996624999999995], [53.0, 54.596624999999996], [56.6, 58.83087499999999], [57.4, 59.63087499999999], [62.0, 64.230875], [68.6, 70.83087499999999], [69.4, 71.630875], [73.0, 76.26683333333334], [77.0, 80.72525], [80.6, 84.66095833333334], [81.4, 85.46095833333335], [85.0, 89.39370833333335], [90.0, 94.59466666666668], [92.6, 97.19466666666668], [93.4, 97.99466666666669], [98.0, 102.78133333333335], [102.0, 106.78133333333335], [106.0, 111.30045833333335], [110.6, 115.90045833333335], [111.4, 116.70045833333336], [116.0, 121.30045833333335], [120.6, 126.34070833333335], [121.4, 127.14070833333336], [126.0, 131.74070833333337], [131.0, 136.74070833333337], [136.0, 141.74070833333337], [141.0, 146.74070833333337], [145.6, 151.34070833333337], [146.4, 152.14070833333338], [150.0, 157.29141666666672], [153.0, 160.29141666666672], [155.6, 164.4178333333334], [156.4, 165.2178333333334], [160.5, 169.3178333333334], [164.6, 174.08100000000007], [165.8, 175.2810000000001], [174.0, 183.48100000000008], [174.5, 183.98100000000008]]
+// Video time -> animation time: piecewise linear, so caption windows stretch to fit the narration.
+const toOld = (t) => { for (let i = 1; i < TMAP.length; i++) { const [o0, n0] = TMAP[i - 1], [o1, n1] = TMAP[i]; if (t <= n1) return n1 === n0 ? o1 : o0 + ((t - n0) * (o1 - o0)) / (n1 - n0) } return TMAP[TMAP.length - 1][0] }
+window.setTime = (ms) => { const o = toOld(ms / 1000) * 1000; for (const a of document.getAnimations()) a.currentTime = o }
+window.ready = document.fonts.ready.then(() => true)
+</script>
+</body>
+</html>
