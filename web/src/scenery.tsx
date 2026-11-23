@@ -114,9 +114,9 @@ export function VineRows(props: { class?: string }) {
  * Overscheduled: a crammed calendar, a ringing alarm clock and a frantic zig-zag. Drawn in currentColor;
  * the CSS sets the colour, the fade and where on the card it sits.
  */
-export function CardBackdrop(props: { card: 'B' | 'O'; class?: string; fit?: boolean }) {
+export function CardBackdrop(props: { card: 'B' | 'O'; class?: string }) {
   return (
-    <svg class={`card-bd ${props.class ?? ''}`} viewBox="0 0 200 120" preserveAspectRatio={props.fit ? 'xMaxYMid meet' : 'xMidYMid slice'} aria-hidden="true"
+    <svg class={`card-bd ${props.class ?? ''}`} viewBox="0 0 200 120" preserveAspectRatio="xMidYMid meet" aria-hidden="true"
       fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
       {props.card === 'B' ? (
         <>

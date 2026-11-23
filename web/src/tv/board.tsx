@@ -246,7 +246,7 @@ function Rail(props: { kind: 'B' | 'O'; filled: number; board?: (string | null)[
           const last = i === caps.length - 1
           return (
             <div class={`tv-ticket ${filled ? 'filled' : ''} ${fresh === i + 1 ? 'fresh' : ''}`}>
-              {filled ? <CardBackdrop card={props.kind} /> : null}
+              <CardBackdrop card={props.kind} />
               {filled ? (
                 <span class={`stamp stamp-${props.kind}`} style={{ transform: `rotate(${[-8, 5, -4, 7, -6, 4][i]}deg)` }}>
                   {ui(props.kind === 'B' ? 'stamp_breezy' : 'stamp_over')}
@@ -256,7 +256,6 @@ function Rail(props: { kind: 'B' | 'O'; filled: number; board?: (string | null)[
                   {power ? <span class="tv-power"><Icon name={power} /><span>{ui('power_short_' + power)}</span></span> : null}
                   {props.kind === 'O' && i === 4 ? <span class="tv-veto-mark"><Icon name="veto" /> {term('veto')}</span> : null}
                   {last ? <span class="tv-ticket-end">{ui(props.kind === 'B' ? 'tv_win' : 'tv_lose')}</span> : null}
-                  {!power && !last ? <span class="tv-ticket-blank"><Icon name={props.kind === 'B' ? 'breezy' : 'over'} /></span> : null}
                 </span>
               )}
               <span class="tv-ticket-no">{filled ? ui('tv_admit', { n: String(i + 1).padStart(2, '0') }) : String(i + 1).padStart(2, '0')}</span>

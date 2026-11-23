@@ -2,7 +2,7 @@ import { useState } from 'preact/hooks'
 import type { Card, GameView, PrivateResult, RoomView } from '../types'
 import { cardName, hint, powerName, roleName, teamName, term, theme, ui } from '../theme'
 import { Icon } from '../icons'
-import { MiniVineyard, VineyardBand, CardBackdrop } from '../scenery'
+import { MiniVineyard, VineyardBand } from '../scenery'
 import { itineraryDays, tagStatus, VoteMark } from '../tv/board'
 import { fullLog, noneYet } from '../history'
 import type { Connection } from '../net'
@@ -142,7 +142,6 @@ export function HandPrompt(props: { hand: Card[]; mode: 'discard' | 'enact'; vet
     kicker: ui('card_kicker'),
     sub: discreet ? undefined : ui(c === 'B' ? 'card_sub_breezy' : 'card_sub_over'),
     art: c === 'B' ? <MiniVineyard class="stub-art" /> : <span class="stub-over"><Icon name="over" /></span>,
-    backdrop: <CardBackdrop card={c === 'B' ? 'B' : 'O'} fit />,
     tone: c === 'B' ? 'breezy' : 'over',
   }))
   if (props.vetoAvailable) options.push({ key: 'veto', label: ui('veto_button'), icon: 'veto', tone: 'neutral', wide: true })
