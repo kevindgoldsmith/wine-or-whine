@@ -182,3 +182,10 @@ The first look read as generic. Of three proposed directions (mockups in a priva
   and on phones.
 - The TV's log sheet is titled "Trip journal" instead of "Itinerary" (Kevin).
 - The layout audit now waits a moment before checking a screen, so the "↓ N more" hint has appeared.
+
+## Faded card pictures; "the house" (2026-11-23)
+- Each Breezy and Overscheduled card has a faded line drawing behind it, drawn as SVG to match the rest:
+  a hammock between two trees with sun and a glass (Breezy), a crammed calendar, a ringing alarm clock and a
+  frantic zig-zag (Overscheduled). It appears on the phone's hand cards (whole drawing at card height, beside the
+  stub), on played tickets in the TV's rails and behind the card moment slip. Never in discreet mode.
+- Babysitter duty now says players "stay back at the house" instead of "the rental" (Kevin).

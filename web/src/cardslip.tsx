@@ -2,6 +2,7 @@
 // and a handwritten one-liner appears. Shown on the TV (as the card beat) and on every phone (as a short
 // overlay). The line is picked from the card count, so the TV and all phones show the same one and the
 // lines don't repeat within a game.
+import { CardBackdrop } from './scenery'
 import { beatT, theme, ui } from './theme'
 
 export interface CardMoment {
@@ -31,6 +32,7 @@ export function CardSlip(props: { m: CardMoment; class?: string }) {
         <span>{ui('header_day', { n: m.day })}</span>
         <span>{beatT('card_count_' + m.card, { n: m.count })}</span>
       </div>
+      <CardBackdrop card={m.card} />
       <span class={`stamp big slip-stamp stamp-${m.card}`} aria-hidden="true">{ui(m.card === 'B' ? 'stamp_breezy' : 'stamp_over')}</span>
       <p class="slip-line">{cardLine(m.card, m.count)}</p>
       {stakes ? <p class="slip-stakes">{stakes}</p> : null}

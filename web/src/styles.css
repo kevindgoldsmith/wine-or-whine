@@ -943,3 +943,26 @@ html.discreet .slip-stakes { color: #a9a9b0; animation: none; }
 .tv-tag.president .tv-tag-vote, .tag.president .tag-vote { color: rgba(251, 246, 234, 0.75); }
 .tv-tag.president .tv-tag-vote.voted, .tag.president .tag-vote.voted { color: #a9d39a; }
 html.discreet .tag-vote.voted, html.discreet .tag.president .tag-vote.voted { color: var(--fg); }
+
+/* =================================================================== faded card pictures */
+/* A hammock (Breezy) or a crammed calendar and alarm clock (Overscheduled) behind each day card. */
+.card-bd { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.17; }
+.tone-breezy .card-bd, .card-B .card-bd, .rail-B .card-bd { color: var(--vine); }
+.tone-over .card-bd, .card-O .card-bd, .rail-O .card-bd { color: var(--stamp); }
+/* Phone hand: the picture fades in from the left so the card's name stays crisp */
+.layout-cards .choice { position: relative; overflow: hidden; }
+.layout-cards .choice > :not(.card-bd) { position: relative; z-index: 1; }
+.layout-cards .choice .card-bd { -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 60%); mask-image: linear-gradient(90deg, transparent 0%, #000 60%); opacity: 0.22; }
+/* TV ticket rail: played tickets */
+.tv-ticket.filled { position: relative; overflow: hidden; }
+.tv-ticket.filled > :not(.card-bd) { position: relative; z-index: 1; }
+.tv-ticket.filled .card-bd { opacity: 0.2; }
+/* Card moment slip: behind everything under the header */
+.card-slip .card-bd { top: 2.2rem; height: calc(100% - 2.2rem); opacity: 0.13; }
+.card-slip.tv .card-bd { top: 3rem; height: calc(100% - 3rem); }
+.card-slip > :not(.card-bd) { position: relative; z-index: 1; }
+html.discreet .card-bd { display: none; }
+/* Phone hand: the whole drawing, card height, just left of the stub */
+.layout-cards .choice .card-bd { inset: 6px 92px 6px auto; width: 62%; height: calc(100% - 12px); }
+@media (max-width: 379px) { .layout-cards .choice .card-bd { right: 10px; width: 58%; } }
+.layout-cards .choice.wide { overflow: visible; }

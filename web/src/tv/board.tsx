@@ -7,7 +7,7 @@ import { cardName, logT, powerName, roleName, term, theme, ui } from '../theme'
 import type { Connection } from '../net'
 import { CardSlip } from '../cardslip'
 import { Icon } from '../icons'
-import { NapaScene, Vine, VineRows } from '../scenery'
+import { CardBackdrop, NapaScene, Vine, VineRows } from '../scenery'
 import type { Beat } from './beats'
 
 // ------------------------------------------------------------------ shared bits
@@ -246,6 +246,7 @@ function Rail(props: { kind: 'B' | 'O'; filled: number; board?: (string | null)[
           const last = i === caps.length - 1
           return (
             <div class={`tv-ticket ${filled ? 'filled' : ''} ${fresh === i + 1 ? 'fresh' : ''}`}>
+              {filled ? <CardBackdrop card={props.kind} /> : null}
               {filled ? (
                 <span class={`stamp stamp-${props.kind}`} style={{ transform: `rotate(${[-8, 5, -4, 7, -6, 4][i]}deg)` }}>
                   {ui(props.kind === 'B' ? 'stamp_breezy' : 'stamp_over')}

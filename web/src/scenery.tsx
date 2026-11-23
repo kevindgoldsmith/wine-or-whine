@@ -108,3 +108,43 @@ export function VineRows(props: { class?: string }) {
     </svg>
   )
 }
+
+/**
+ * Faded line drawings behind a day card. Breezy: a hammock between two trees, sun, a lazy bird.
+ * Overscheduled: a crammed calendar, a ringing alarm clock and a frantic zig-zag. Drawn in currentColor;
+ * the CSS sets the colour, the fade and where on the card it sits.
+ */
+export function CardBackdrop(props: { card: 'B' | 'O'; class?: string; fit?: boolean }) {
+  return (
+    <svg class={`card-bd ${props.class ?? ''}`} viewBox="0 0 200 120" preserveAspectRatio={props.fit ? 'xMaxYMid meet' : 'xMidYMid slice'} aria-hidden="true"
+      fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      {props.card === 'B' ? (
+        <>
+          <circle cx="164" cy="30" r="15" />
+          <path d="M150 12 l-4 -6 M178 12 l4 -6 M186 30 h7 M142 30 h-7" />
+          <path d="M0 104 C 40 92, 80 98, 120 93 S 176 86, 200 92" />
+          <path d="M52 96 V 50 M128 92 V 46" />
+          <path d="M52 50 c -10 -8, -20 -4, -26 2 M52 50 c 6 -12, 18 -12, 26 -6 M52 50 c -2 -12, -10 -18, -16 -18" />
+          <path d="M128 46 c -10 -8, -20 -4, -26 2 M128 46 c 6 -12, 18 -12, 26 -6 M128 46 c 2 -12, 10 -18, 16 -18" />
+          <path d="M52 58 Q 90 86 128 54" />
+          <path d="M60 64 Q 90 80 120 62" stroke-width="2" />
+          <path d="M22 26 q 5 -5 10 0 q 5 -5 10 0" stroke-width="2.4" />
+          <path d="M150 70 h14 M157 70 v12 M150 82 h14 M151 58 h12 l-2 8 q -4 4 -8 0 z" stroke-width="2.4" />
+        </>
+      ) : (
+        <>
+          <rect x="14" y="22" width="92" height="82" rx="6" />
+          <path d="M14 40 H 106 M34 14 v14 M86 14 v14" />
+          <path d="M26 54 h12 M46 54 h12 M66 54 h12 M86 54 h10 M26 70 h12 M46 70 h12 M66 70 h12 M86 70 h10 M26 86 h12 M46 86 h12 M66 86 h12" stroke-width="2.4" />
+          <path d="M44 66 l 16 8 M44 74 l 16 -8 M64 82 l 16 8 M64 90 l 16 -8" stroke-width="2" />
+          <circle cx="150" cy="62" r="26" />
+          <path d="M150 62 V 44 M150 62 l 13 9" />
+          <path d="M128 40 a 10 10 0 0 1 12 -12 M172 40 a 10 10 0 0 0 -12 -12 M136 88 l -6 8 M164 88 l 6 8" />
+          <path d="M120 22 l 6 6 M180 22 l -6 6" stroke-width="2.4" />
+          <path d="M114 110 l 14 -8 l -2 7 l 18 -9 l -2 7 l 22 -10" stroke-width="2.4" />
+          <path d="M190 10 v 16 M190 34 v 1" />
+        </>
+      )}
+    </svg>
+  )
+}

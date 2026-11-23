@@ -52,6 +52,8 @@ export interface Option {
   icon?: string
   /** Illustration for a ticket's stub (cards layout). Never shown in discreet mode. */
   art?: JSX.Element
+  /** Faded picture behind the whole card. Never shown in discreet mode. */
+  backdrop?: JSX.Element
   /** Small caps line above the label (e.g. "DAY CARD"). */
   kicker?: string
   tone?: 'yes' | 'no' | 'breezy' | 'over' | 'neutral' | 'danger'
@@ -120,6 +122,7 @@ export function ChoiceList(props: {
                 setSel(o.key)
               }}
             >
+              {!discreet && o.backdrop ? o.backdrop : null}
               {!discreet && o.icon ? <span class="choice-icon"><Icon name={o.icon} /></span> : null}
               <span class="choice-text">
                 {!discreet && o.kicker ? <span class="choice-kicker">{o.kicker}</span> : null}
