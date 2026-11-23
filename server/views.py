@@ -21,6 +21,7 @@ def room_public(room: Room, online: set[str], join_url: str) -> dict:
         "theme": room.theme,
         "hints": room.hints,
         "voice": room.voice,
+        "test_mode": room.test_mode,
         "house": room.house,
         "host_id": room.host_id,
         "tv_hosted": room.tv_hosted,

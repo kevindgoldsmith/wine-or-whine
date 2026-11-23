@@ -931,3 +931,6 @@ html.discreet .slip-stakes { color: #a9a9b0; animation: none; }
 .tv-board.over .tv-award.many .tv-award-name { font-size: 1.15rem; line-height: 1.1; }
 .gameover-log { margin-top: 8px; }
 @keyframes slip-stamp-in { from { opacity: 0; transform: scale(1.45) rotate(-12deg); } to { opacity: 1; transform: rotate(-4deg); } }
+.toggle > span { display: flex; flex-direction: column; min-width: 0; }
+.toggle-hint { font-size: 0.8rem; line-height: 1.3; color: var(--muted); }
+.toggle input { flex: none; }

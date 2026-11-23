@@ -42,6 +42,22 @@ export function isTestTab(): boolean {
   }
 }
 
+/**
+ * The host can also switch on test mode for a room. A tab that opens such a room is marked before it connects,
+ * so it joins fresh. A tab that was already seated when the host switched it on is marked when it hears about it,
+ * and its seat token is copied over first so it keeps its seat across reloads.
+ */
+export function markTestTab(keepToken?: string) {
+  try {
+    if (sessionStorage.getItem(TEST_FLAG) === '1') return
+    const token = keepToken ? localStorage.getItem(keepToken) : null
+    sessionStorage.setItem(TEST_FLAG, '1')
+    if (keepToken && token) sessionStorage.setItem(keepToken, token)
+  } catch {
+    /* storage blocked: stay a normal tab */
+  }
+}
+
 function backing(): Storage | null {
   try {
     return isTestTab() ? sessionStorage : localStorage

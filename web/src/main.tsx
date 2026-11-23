@@ -9,6 +9,7 @@ import '@fontsource/caveat/600.css'
 import './styles.css'
 import { Home } from './home'
 import { PhoneApp } from './phone/App'
+import { markTestTab } from './net'
 import { TvApp } from './tv/TvApp'
 
 const m = location.pathname.match(/^\/([A-Za-z]{4})(\/tv)?\/?$/)
@@ -20,7 +21,19 @@ if (m) {
     document.documentElement.classList.add('tv-mode')
     render(<TvApp code={code} />, root)
   } else {
-    render(<PhoneApp code={code} />, root)
+    // If the host turned on test mode for this room, this tab becomes its own player before it connects.
+    const ctl = new AbortController()
+    const timer = setTimeout(() => ctl.abort(), 2500)
+    fetch(`/api/rooms/${code}`, { signal: ctl.signal })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((info) => {
+        if (info?.test_mode) markTestTab()
+      })
+      .catch(() => {})
+      .finally(() => {
+        clearTimeout(timer)
+        render(<PhoneApp code={code} />, root)
+      })
   }
 } else {
   render(<Home />, root)

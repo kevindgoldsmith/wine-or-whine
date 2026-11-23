@@ -151,3 +151,14 @@ The first look read as generic. Of three proposed directions (mockups in a priva
   menu is titled "Host tools" with no emoji; TV awards shared by 3+ people use a smaller name size and the
   game-over board keeps extra room above the credit line. The "↓ N more" hint now re-measures after a pick
   (the confirm grows to two lines).
+
+## Test mode as a host toggle (2026-11-23)
+- Kevin asked for test mode to be a host setting. The lobby's host panel (phone host, and the TV's Host drawer)
+  has a **Test mode** switch. While it's on, every browser tab that opens the room joins as its own player,
+  exactly like `?test` (which still works per tab).
+- A phone page checks `GET /api/rooms/{code}` (now includes `test_mode`) before connecting, so a new tab is
+  marked before it could pick up another tab's seat. A tab that was already seated when the host switched it
+  on copies its seat token into the tab when it hears about it, so it keeps its seat across reloads.
+- Once a tab is a test tab it stays one for its lifetime, even if the host switches test mode off; new tabs
+  behave normally again. The trade-off for real phones in a test-mode room: closing the tab (not just
+  reloading) loses the seat, and the player needs their rejoin code. Hence "Leave off for real games."

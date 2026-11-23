@@ -83,6 +83,7 @@ export interface RoomView {
   paused: boolean
   theme: string
   hints: boolean
+  test_mode?: boolean
   voice: boolean
   house: Record<string, (Power | null)[]>
   host_id: string | null

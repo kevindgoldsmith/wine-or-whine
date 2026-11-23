@@ -566,3 +566,18 @@ def test_tv_host_survives_restart(tmp_path):
         st = tv.recv_until("state")
         assert st["tv_admin"] is True and st["room"]["host_id"] == "tv"
         close_all_phones()
+
+
+def test_host_can_toggle_test_mode():
+    from server.rooms import Room, RoomError
+    r = Room(code="TEST", host_key_hash="x")
+    r.players = []
+    r.host_id = "h"
+    r.host_action("h", {"type": "settings", "test_mode": True}, {"official": {}}, {})
+    assert r.test_mode is True
+    assert Room.from_dict(r.to_dict()).test_mode is True
+    try:
+        r.host_action("h", {"type": "settings", "test_mode": "yes"}, {"official": {}}, {})
+        assert False, "non-bool accepted"
+    except RoomError:
+        pass

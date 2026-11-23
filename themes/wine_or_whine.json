@@ -339,7 +339,9 @@
     "you_won": "You won!",
     "you_lost": "You lost.",
     "power_kicker": "Day {n} · your power",
-    "host_menu_title": "Host tools"
+    "host_menu_title": "Host tools",
+    "lobby_test_mode": "Test mode",
+    "lobby_test_mode_hint": "Each browser tab joins as its own player, so one device can play several seats. Leave off for real games."
   },
   "hints": {
     "reveal": "Your role is secret. Overschedulers know each other; Chill Parents know nothing.",

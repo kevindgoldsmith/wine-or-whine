@@ -113,7 +113,7 @@ def create_app(settings: Optional[Settings] = None, storage=None, tts: Optional[
         room = hub_of(request).rooms.get(code.upper())
         if not room:
             raise HTTPException(404, "room_missing")
-        return {"code": room.code, "status": room.status, "theme": room.theme, "players": len(room.players)}
+        return {"code": room.code, "status": room.status, "theme": room.theme, "players": len(room.players), "test_mode": room.test_mode}
 
     @app.delete("/api/rooms/{code}")
     async def delete_room(code: str, request: Request):

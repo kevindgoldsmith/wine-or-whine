@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import type { StateMsg } from '../types'
 import { DEFAULT_THEME, errorText, loadTheme, onTheme, theme, ui } from '../theme'
-import { Connection, type ConnStatus, isTestTab, seatStore, store, tokenKey } from '../net'
+import { Connection, type ConnStatus, isTestTab, markTestTab, seatStore, store, tokenKey } from '../net'
 import { buzz, GameCtx, Modal } from './common'
 import { Icon } from '../icons'
 import { type CardMoment, CardSlip } from '../cardslip'
@@ -37,6 +37,7 @@ export function PhoneApp(props: { code: string }) {
         'player',
         (m) => {
           if (m.t === 'state') {
+            if (m.room?.test_mode && !isTestTab()) markTestTab(tokenKey(props.code))
             setMsg(m)
             if (m.me) setKicked(false)
             // A day card was played: everyone gets the card moment (stamp + one-liner) for a few seconds.

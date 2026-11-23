@@ -164,6 +164,10 @@ export function Lobby(props: {
             <input type="checkbox" checked={room.voice} onChange={(e) => conn.host({ type: 'settings', voice: (e.target as HTMLInputElement).checked })} />
             {ui('lobby_voice')}
           </label>
+          <label class="toggle">
+            <input type="checkbox" checked={!!room.test_mode} onChange={(e) => conn.host({ type: 'settings', test_mode: (e.target as HTMLInputElement).checked })} />
+            <span>{ui('lobby_test_mode')}<small class="toggle-hint">{ui('lobby_test_mode_hint')}</small></span>
+          </label>
           {themes.length > 1 ? (
             <label class="field">
               {ui('lobby_theme')}

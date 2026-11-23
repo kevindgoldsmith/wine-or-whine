@@ -74,6 +74,7 @@ class Room:
     paused: bool = False
     hints: bool = True
     voice: bool = True
+    test_mode: bool = False  # host toggle: every browser tab joins as its own player
     house: dict = field(default_factory=dict)  # bracket -> 5-slot list
     game: Optional[GameState] = None
     seat_ids: list[str] = field(default_factory=list)
@@ -201,7 +202,7 @@ class Room:
                 if a["theme"] not in themes:
                     raise RoomError("bad_request")
                 self.theme = a["theme"]
-            for flag in ("hints", "voice"):
+            for flag in ("hints", "voice", "test_mode"):
                 if flag in a:
                     if not isinstance(a[flag], bool):
                         raise RoomError("bad_request")
