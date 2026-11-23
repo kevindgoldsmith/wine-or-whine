@@ -101,7 +101,7 @@ export function ChoiceList(props: {
       window.removeEventListener('scroll', measure)
       window.removeEventListener('resize', measure)
     }
-  }, [props.options.length])
+  }, [props.options.length, sel])
   return (
     <div class={`choices layout-${layout}`}>
       <div ref={listRef} class={`choice-list ${sel && !discreet ? 'has-sel' : ''} ${props.options.length > 4 ? 'many' : ''}`} style={{ '--cols': String(Math.max(1, props.options.filter((o) => !o.wide).length)) } as any}>

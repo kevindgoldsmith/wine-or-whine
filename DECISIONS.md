@@ -147,3 +147,7 @@ The first look read as generic. Of three proposed directions (mockups in a priva
   repeats within a game. The TV beat no longer shows the fixed track caption (it's still on the ticket rail).
 - The phone overlay lasts about 3.4 s and taps away, so it never holds up the next turn. Discreet mode shows it
   plain and still; reduced-motion turns the animation off. A first version fired on every passed vote; dropped.
+- Walkthrough fixes: the phone game-over history folds away behind "Every step (n)" like the Recap; the host
+  menu is titled "Host tools" with no emoji; TV awards shared by 3+ people use a smaller name size and the
+  game-over board keeps extra room above the credit line. The "↓ N more" hint now re-measures after a pick
+  (the confirm grows to two lines).

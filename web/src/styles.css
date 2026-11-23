@@ -899,7 +899,7 @@ html.discreet .choice-label { line-height: 1.2; }
 .slip-head > span:last-child { text-align: right; }
 .card-slip.card-B .slip-head { background: var(--vine); }
 .card-slip.card-O .slip-head { background: var(--stamp); }
-.slip-stamp.stamp.big { font-family: var(--mono); font-size: 1.9rem; margin: 10px 0 0; letter-spacing: 0.1em; background: rgba(251, 246, 234, 0.6); animation: stamp-in 0.32s cubic-bezier(.3, 1.6, .5, 1) 0.45s both; }
+.slip-stamp.stamp.big { font-family: var(--mono); font-size: 1.9rem; margin: 10px 0 0; letter-spacing: 0.1em; background: rgba(251, 246, 234, 0.6); animation: slip-stamp-in 0.32s cubic-bezier(.3, 1.6, .5, 1) 0.45s both; }
 .slip-stamp.stamp-B { color: var(--vine); }
 .slip-stamp.stamp-O { color: var(--stamp); font-size: 1.9rem; letter-spacing: 0.1em; }
 .slip-line { margin: 0; padding: 0 18px; font-family: var(--hand); font-size: 1.7rem; line-height: 1.1; color: var(--ink); text-wrap: balance; animation: prompt-in 0.4s ease-out 0.9s both; }
@@ -926,3 +926,8 @@ html.discreet .slip-stakes { color: #a9a9b0; animation: none; }
 @media (prefers-reduced-motion: reduce) {
   .card-slip, .slip-stamp.stamp.big, .slip-line, .slip-stakes, .slip-overlay { animation: none !important; }
 }
+/* TV game over: three-way awards with long names stay clear of the credit line */
+.tv-board.over { padding-bottom: 3.2rem; }
+.tv-board.over .tv-award.many .tv-award-name { font-size: 1.15rem; line-height: 1.1; }
+.gameover-log { margin-top: 8px; }
+@keyframes slip-stamp-in { from { opacity: 0; transform: scale(1.45) rotate(-12deg); } to { opacity: 1; transform: rotate(-4deg); } }

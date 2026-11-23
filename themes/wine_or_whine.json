@@ -338,7 +338,8 @@
     "more_below": "↓ {n} more",
     "you_won": "You won!",
     "you_lost": "You lost.",
-    "power_kicker": "Day {n} · your power"
+    "power_kicker": "Day {n} · your power",
+    "host_menu_title": "Host tools"
   },
   "hints": {
     "reveal": "Your role is secret. Overschedulers know each other; Chill Parents know nothing.",

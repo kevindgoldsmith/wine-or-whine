@@ -464,12 +464,12 @@ export function GameOver(props: { g: GameView; room: RoomView; isHost: boolean; 
       ) : (
         <p class="status-line">{ui('play_again_wait')}</p>
       )}
-      <section>
-        <h3>{ui('catchup_full')}</h3>
+      <details class="recap-all gameover-log">
+        <summary>{ui('catchup_full_n', { n: fullLog(g.history, names).length })}</summary>
         <ol class="log">
           {fullLog(g.history, names).map((l) => <li>{l.text}</li>)}
         </ol>
-      </section>
+      </details>
     </main>
   )
 }

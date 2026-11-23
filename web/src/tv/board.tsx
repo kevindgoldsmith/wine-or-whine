@@ -308,7 +308,7 @@ function TvAwards(props: { g: GameView; names: string[] }) {
   return (
     <section class="tv-awards" aria-label={ui('awards')}>
       {props.g.superlatives.map((a) => (
-        <div class="tv-award">
+        <div class={`tv-award ${a.seats.length >= 3 ? 'many' : ''}`}>
           <span class="tape tape-c" aria-hidden="true" />
           <span class="tv-award-title">{th.superlatives[a.key]?.title}</span>
           <span class="tv-award-name">{a.seats.map((s) => props.names[s]).join(', ')}</span>

@@ -133,7 +133,7 @@ export function PhoneApp(props: { code: string }) {
     <button type="button" class="small host-btn" onClick={() => setMenu(true)}>{ui('host_tools')}</button>
   ) : null
   const menuModal = menu ? (
-    <Modal title={ui('lobby_host_badge')} onClose={() => setMenu(false)}>
+    <Modal title={ui('host_menu_title')} onClose={() => setMenu(false)}>
       {room.status === 'active' ? (
         <button type="button" class="big" onClick={() => {
           conn.host({ type: room.paused ? 'resume' : 'pause' })
@@ -145,7 +145,7 @@ export function PhoneApp(props: { code: string }) {
         <button type="button" class="big" onClick={() => {
           conn.host({ type: 'make_host', player_id: 'tv' })
           setMenu(false)
-        }}>📺 {ui('host_give_tv')}</button>
+        }}>{ui('host_give_tv')}</button>
       ) : null}
       {codes ? (
         <>
